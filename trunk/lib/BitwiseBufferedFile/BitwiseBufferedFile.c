@@ -199,7 +199,6 @@ ssize_t readBitBuffer
     if(bitFile->emptyFile) return 0;
     while(length > 0)
     {
-        //printf("length: %i\n", length);
         if
         (
             bitFile->position >= BUFFER_CELLS*CELL_TYPE_LENGTH ||
