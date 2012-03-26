@@ -18,14 +18,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
-/**
- * CELL_TYPE_LENGTH is a configurable paramether.
- * A definition must be given before including configurableBuffer.h.
- * If no definition is found, the default value 64 is used.
- * The other paramethers are automatically derived from CELL_TYPE_LENGTH.
- **/
 
 #define ROOT_INDEX 256//TODO in realtà va messa nell'hash sta roba
-#define INDEX_LENGTH 16
-#define MAX_CHILD 256
-
+#define INDEX_LENGTH 16 //log_2(MAX_CHILD)
+#define MAX_CHILD 65535
+#define INDEX_TYPE uint64_t

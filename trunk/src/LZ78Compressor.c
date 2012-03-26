@@ -1,4 +1,4 @@
-**
+/**
  * @file LZ78Compressor.c
  * @author Cosimo Sacco <cosimosacco@gmail.com>
  * @author Davide Silvestri <davidesil.web@gmail.com>
@@ -24,42 +24,44 @@
 #include LZ78CompressorConfiguration.h
 
 int compress(const char* path)
-{                                                                                 
-    uint32_t next_index = ROOT_INDEX + 1;
-    uint32_t current_index = ROOT_INDEX;
+{
+    INDEX_TYPE child_index = ROOT_INDEX + 1;
+    INDEX_TYPE search_index = ROOT_INDEX;
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(path, 0);
-    struct BitwiseBufferedFile* w = openBitwiseBufferedFile(path, 1);
+    struct BitwiseBufferedFile* w = openBitwiseBufferedFile(path, 1);//Deve essere un altro file!
     if(r == NULL || w == NULL)
     {
         return -1;
     }
-    
+
     LZ78HashTable* hash_table = hash_initialize();//TODO inizializzazione hash_table
-    
-    CELL_TYPE read;
-    ssize_t bitsRead;
+
+    uint8_t read;
+    ssize_t bitsRead = 0;
     while(r->emptyFile == 0)
     {
-         bitsRead += readBitBuffer(r, &read, CELL_TYPE_LENGTH);//TODO gestione errori
-	 int child = hash_lookup(hash_table,current_index,read); //TODO
-	 if(child != -1){
-	    next_index = child;
-	 }
-	 else{ //read not found in table
-	    writeBitBuffer(w, current_index, INDEX_LENGTH); //TODO gestione errori
-	    hash_insert(hash_table,current_index,read,next_index);//TODO
-	    next_index ++;
-	    current_index = ROOT_INDEX;
-	    if (next_index == MAX_CHILD){
-	      hash_reset(hash_table);//TODO
-	      next_index = ROOT_INDEX + 1;
-	    }
-	 }
+        bitsRead += readBitBuffer(r, &read, 8);//TODO gestione errori + byte per byte
+        int child = hash_lookup(hash_table, search_index, read); //TODO
+        if(child != -1){
+            search_index = child;
+        }
+        else{ //read not found in table
+            writeBitBuffer(w, search_index, INDEX_LENGTH); //TODO gestione errori
+            hash_insert(hash_table, search_index, read, child_index);//TODO funzione
+            child_index ++;
+            //search_index = ROOT_INDEX;
+            search_index = read;
+            if (child_index == MAX_CHILD){
+              hash_reset(hash_table);//TODO
+              child_index = ROOT_INDEX + 1;
+            }
+        }
     }
-    writeBitBuffer(w, current_index, INDEX_LENGTH); //TODO gestione errori
-    if(current_index != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto (è arrivato il fine file e non è stato riconosciuto)
+    writeBitBuffer(w, search_index, INDEX_LENGTH); //TODO gestione errori
+    /*if(search_index != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
-    }
+    }*/
+    writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH); //Fine file (todo Huffman di tutte le codifiche)
     closeBitwiseBufferedFile(r);
 
     return bitsRead;
