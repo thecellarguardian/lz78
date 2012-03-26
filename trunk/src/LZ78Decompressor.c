@@ -56,11 +56,18 @@ int decompress(const char* inputFile, const char* outputFile)
 	for(index = 0; index < length; index ++){
 	    writeBitBuffer(w, result+index, 8); //TODO FUNZIONE CHE FA A BYTE
 	}
-	// la prima volta non va fatto
+
 	table[child_index].father = current_index;
-	table[child_index].symbol = ***;
-	table[child_index].word = ***;
-	table[child_index].length = ***;
+	table[child_index].length = length++;
+	table[child_index].word = malloc(length); //TODO gestire errore
+	bcopy(...);
+	
+	//aggiornamento del precedente, la prima volta non va fatto
+	if(...){
+	    table[child_index-1].symbol = ***;
+	    table[child_index-1].word = ***;
+	}
+	
 	//......
 	child_index ++;
 	if(child_index == MAX_CHILD){
