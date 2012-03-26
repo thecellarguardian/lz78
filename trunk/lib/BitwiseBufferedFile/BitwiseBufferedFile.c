@@ -38,6 +38,7 @@ struct BitwiseBufferedFile
 };
 
 /*TODO: provare con fopen, fclose, fread e fwrite! */
+/*TODO: le cose che può ottimizzare il compilatore lasciamole ottimizzare a lui (divisioni per costanti ecc...)*/
 struct BitwiseBufferedFile* openBitwiseBufferedFile(const char* path, int mode)
 {
     int fileDescriptor = -1;

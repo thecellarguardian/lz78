@@ -21,4 +21,4 @@
 
 #include BitwiseBufferedFile.h
 
-int compress(const char* path);
+int compress(const char* inputFile, const char* outputFile);

@@ -20,6 +20,8 @@
  **/
 
 #define ROOT_INDEX 256//TODO in realtà va messa nell'hash sta roba
-#define INDEX_LENGTH 16 //log_2(MAX_CHILD)
+#define INITIAL_INDEX_LENGTH 9 //log_2(ROOT_INDEX)
+#define FINAL_INDEX_LENGTH 16 //log_2(MAX_CHILD)
+#define INDEX_LENGTH_MASK 511 //111111111
 #define MAX_CHILD 65535
-#define INDEX_TYPE uint64_t
+
