@@ -71,7 +71,7 @@ int compress(const char* inputFile, const char* outputFile)
             }
         }
     }
-    writeBitBuffer(w, lookup_index, indexLength); //TODO gestione errori
+    writeBitBuffer(w, lookup_index, indexLength); //TODO gestione errori + #! decompressor aaa radius
     /*if(lookup_index != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
