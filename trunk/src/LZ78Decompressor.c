@@ -34,7 +34,7 @@ int decompress(const char* inputFile, const char* outputFile)
     size_t indexLength = INITIAL_INDEX_LENGTH;
     uint8_t* result;
     ssize_t index = 0;
-    size_t length = 0;
+    CELL_TYPE length = 0;
     
     struct node table [MAX_CHILD];
     
@@ -42,6 +42,8 @@ int decompress(const char* inputFile, const char* outputFile)
     {
         return -1;
     }
+    
+    //TODO inizializzazione table
    
     while(r->emptyFile == 0)
     {
@@ -49,12 +51,17 @@ int decompress(const char* inputFile, const char* outputFile)
 	if(current_index == ROOT_INDEX){
 	    break;
 	}
-	result = table_lookup(table, current_index, indexLength); //TODO gestione errori
-	length = sizeof(result);
+	result = table[current_index].word; //TODO gestione errori
+	length = table[current_index].length;
 	for(index = 0; index < length; index ++){
 	    writeBitBuffer(w, result+index, 8); //TODO FUNZIONE CHE FA A BYTE
 	}
+	// la prima volta non va fatto
 	table[child_index].father = current_index;
+	table[child_index].symbol = ***;
+	table[child_index].word = ***;
+	table[child_index].length = ***;
+	//......
 	child_index ++;
 	if(child_index == MAX_CHILD){
 	    table_reset(table);//TODO
