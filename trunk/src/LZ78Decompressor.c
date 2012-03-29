@@ -23,13 +23,6 @@
 #include LZ78Decompressor.h
 #include LZ78CompressorConfiguration.h
 
-struct node {
-    CELL_TYPE father;
-    uint8_t symbol;
-    uint8_t* word;
-    CELL_TYPE length; // worst case = tree levels
-};
-
 int decompress(const char* inputFile, FILE* outputFile) //Attenzione: generalizzare a FILE*
 {
     CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
@@ -41,7 +34,7 @@ int decompress(const char* inputFile, FILE* outputFile) //Attenzione: generalizz
     uint8_t* result;
     CELL_TYPE length = 0;
     int notFirstOccurence = 0;
-    struct node table [MAX_CHILD];
+    struct Node table[MAX_CHILD];
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
@@ -63,7 +56,7 @@ int decompress(const char* inputFile, FILE* outputFile) //Attenzione: generalizz
             errno = EBADFD;
             goto exceptionHandler;
         }
-        table[childIndex].father = currentIndex;
+        //table[childIndex].father = currentIndex;
         table[childIndex].length = length + 1;
         table[childIndex].word = malloc(length + 1);
         if(table[childIndex].word == NULL) goto exceptionHandler;
@@ -74,7 +67,7 @@ int decompress(const char* inputFile, FILE* outputFile) //Attenzione: generalizz
          **/
         if(notFirstOccurence)
         {
-            table[childIndex - 1].symbol = *result;
+            //table[childIndex - 1].symbol = *result;
             table[childIndex - 1].word[table[childIndex - 1].lenght - 1] = *result;
         }
         childIndex++;

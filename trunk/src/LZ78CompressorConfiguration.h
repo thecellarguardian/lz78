@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#define ROOT_INDEX 256//TODO in realtà va messa nell'hash sta roba
+#define ROOT_INDEX 256//TODO: DEVE essere 256, altrimenti non funziona nulla (vedi tableCreate)
 #define INITIAL_INDEX_LENGTH 9 //log_2(ROOT_INDEX)
 #define FINAL_INDEX_LENGTH 16 //log_2(MAX_CHILD)
 #define INDEX_LENGTH_MASK 511 //111111111
