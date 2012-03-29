@@ -19,9 +19,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-struct node {
-    CELL_TYPE father;
-    uint8_t symbol;
-    uint8_t* word;
-    CELL_TYPE length; // worst case = tree levels
-};
+ int decompress(const char* inputFile, FILE* outputFile);

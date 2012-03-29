@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <endian.h>
 #include <stdio.h>
+#include <strings.h>
 #include "../utilities/mathUtils.h"
 #include "BitwiseBufferedFile.h"
 
@@ -168,7 +169,7 @@ int closeBitwiseBufferedFile(struct BitwiseBufferedFile* bitFile)
         );
     }
     error = close(bitFile->fileDescriptor);
-    bzero(bitFile, sizeof(BitwiseBufferedFile));
+    bzero(bitFile, sizeof(struct BitwiseBufferedFile));
     free(bitFile);
     return error;
 }

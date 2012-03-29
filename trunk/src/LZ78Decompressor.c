@@ -23,6 +23,13 @@
 #include LZ78Decompressor.h
 #include LZ78CompressorConfiguration.h
 
+struct node {
+    CELL_TYPE father;
+    uint8_t symbol;
+    uint8_t* word;
+    CELL_TYPE length; // worst case = tree levels
+};
+
 int decompress(const char* inputFile, FILE* outputFile) //Attenzione: generalizzare a FILE*
 {
     CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;

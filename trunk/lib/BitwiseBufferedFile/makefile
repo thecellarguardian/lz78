@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -O2 -Wall -Werror -pg -ggdb
 
 testbin: BitwiseBufferedFile.o 
-	$(CC) -o $@ -g $^
+	$(CC) -S -o $@ -g $^
 	
 BitwiseBufferedFile.o: BitwiseBufferedFile.h ../utilities/mathUtils.h
 
