@@ -23,13 +23,12 @@
 #include LZ78Compressor.h
 #include LZ78CompressorConfiguration.h
 
-int compress(FILE* inputFile, const char* outputFile)
+int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i parametri, output sia un FILE*
 {
     CELL_TYPE childIndex = ROOT_INDEX + 1;
     CELL_TYPE lookupIndex = ROOT_INDEX;
     CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     CELL_TYPE child;
-    //struct BitwiseBufferedFile* r = openBitwiseBufferedFile(inputFile, 0);
     struct BitwiseBufferedFile* w = openBitwiseBufferedFile(outputFile, 1);//ATTENZIONE: e se fossero socket? generalizzare a descrittore di file
     size_t indexLength = INITIAL_INDEX_LENGTH;
     uint8_t readByte;
@@ -41,6 +40,7 @@ int compress(FILE* inputFile, const char* outputFile)
         return -1;
     }
     hashTable = hashInitialize();//TODO inizializzazione hash_table
+    if(hashTable == NULL) goto exceptionHandler;
     while(fread(&readByte, 1, 1, inputFile))
     {
         //readBits += fread(r, &readByte, 8);//TODO gestione errori + byte per byte
@@ -74,15 +74,15 @@ int compress(FILE* inputFile, const char* outputFile)
     }
     //fine file o c'è stato un errore?
     if(feof(inputFile) == 0){
-	errno = EBADFD;
-	return -1;
+    errno = EBADFD;
+    return -1;
     }
-    
+
     writeBitBuffer(w, lookupIndex, indexLength); //TODO gestione errori + #! decompressor aaa radius
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
     writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH); //Fine file
-    closeBitwiseBufferedFile(r);
+    closeBitwiseBufferedFile(w);
     return 0;
 }

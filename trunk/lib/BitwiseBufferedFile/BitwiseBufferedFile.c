@@ -146,6 +146,7 @@ ssize_t loadBitBuffer(int fileDescriptor, CELL_TYPE* buffer, size_t count)
 
 int closeBitwiseBufferedFile(struct BitwiseBufferedFile* bitFile)
 {
+    int error;
     if(bitFile == NULL)
     {
         errno = EINVAL;
@@ -166,8 +167,10 @@ int closeBitwiseBufferedFile(struct BitwiseBufferedFile* bitFile)
             index*sizeof(CELL_TYPE) + (offset >> 3)
         );
     }
+    error = close(bitFile->fileDescriptor);
+    bzero(bitFile, sizeof(BitwiseBufferedFile));
     free(bitFile);
-    return close(bitFile->fileDescriptor);
+    return error;
 }
 
 ssize_t readBitBuffer

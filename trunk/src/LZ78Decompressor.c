@@ -23,60 +23,64 @@
 #include LZ78Decompressor.h
 #include LZ78CompressorConfiguration.h
 
-int decompress(const char* inputFile, FILE* outputFile)
+int decompress(const char* inputFile, FILE* outputFile) //Attenzione: generalizzare a FILE*
 {
     CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(inputFile, 0);
     //struct BitwiseBufferedFile* w = openBitwiseBufferedFile(outputFile, 1);//ATTENZIONE: e se fossero socket? generalizzare a descrittore di file
     CELL_TYPE currentIndex;
     CELL_TYPE childIndex = ROOT_INDEX + 1;
-    ssize_t bitsRead = 0;
     size_t indexLength = INITIAL_INDEX_LENGTH;
     uint8_t* result;
-    ssize_t index = 0;
     CELL_TYPE length = 0;
     int notFirstOccurence = 0;
-    
     struct node table [MAX_CHILD];
-    
-    if(r == NULL || w == NULL)
+    if(r == NULL || outputFile == NULL)
     {
+        errno = EINVAL;
+        if(r != NULL) closeBitwiseBufferedFile(r);
         return -1;
     }
-    
-    tableInitialize(table);//TODO inizializzazione table
-   
+    tableInitialize(table);//TODO inizializzazione table, gestione errori!
     while(r->emptyFile == 0)
     {
-	bitsRead += readBitBuffer(r, &currentIndex, indexLength);//TODO gestione errori + byte per byte
-	if(currentIndex == ROOT_INDEX){
-	    break;
-	}
-	result = table[currentIndex].word; //TODO gestione errori
-	length = table[currentIndex].length;
-	for(index = 0; index < length; index ++){
-	    fwrite(w, result+index, 8); //TODO FUNZIONE CHE FA A BYTE
-	}
-
-	table[childIndex].father = currentIndex;
-	table[childIndex].length = length + 1;
-	table[childIndex].word = malloc(length + 1); //TODO gestire errore
-	bcopy(result,table[childIndex].word,length);
-	
-	//aggiornamento del precedente, la prima volta non va fatto
-	if(notFirstOccurence){
-	    table[childIndex - 1].symbol = *result;
-	    table[childIndex - 1].word[table[childIndex - 1].lenght - 1] = *result;
-	}
-
-	childIndex ++;
-	if(childIndex == MAX_CHILD){
-	    tableReset(table);//TODO
+        if(readBitBuffer(r, &currentIndex, indexLength) == -1) goto exceptionHandler;
+        if(currentIndex == ROOT_INDEX)
+        {
+            break;
+        }
+        result = table[currentIndex].word;
+        length = table[currentIndex].length;
+        if(fwrite(result, 1, length, outputFile) != length)
+        {
+            errno = EBADFD;
+            goto exceptionHandler;
+        }
+        table[childIndex].father = currentIndex;
+        table[childIndex].length = length + 1;
+        table[childIndex].word = malloc(length + 1);
+        if(table[childIndex].word == NULL) goto exceptionHandler;
+        bcopy(result,table[childIndex].word,length); //DEPRECATED
+        /**
+         * The previous child has to be updated with the current leading byte,
+         * but not the first time (in that case, no previous child exists).
+         **/
+        if(notFirstOccurence)
+        {
+            table[childIndex - 1].symbol = *result;
+            table[childIndex - 1].word[table[childIndex - 1].lenght - 1] = *result;
+        }
+        childIndex++;
+        if(childIndex == MAX_CHILD)
+        {
+            tableReset(table);
             childIndex = ROOT_INDEX + 1;
-	}
-	
+        }
     }
-    
     return 0;
-   
+
+    exceptionHandler:
+        closeBitwiseBufferedFile(r);
+        tableDestroy(table);
+        return -1;
 }
