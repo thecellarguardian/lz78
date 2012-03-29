@@ -45,7 +45,7 @@ int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i par
 	closeBitwiseBufferedFile(w);
 	return -1;
     }
-    while(fread(&readByte, 1, 1, inputFile))
+    while(fread(&readByte, 1, 1, inputFile)) //TODO molte fread!
     {
         child = hash_lookup(hashTable, lookupIndex, readByte);
         if(child != -1) lookupIndex = child;
