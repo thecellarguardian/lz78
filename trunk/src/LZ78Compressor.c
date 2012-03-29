@@ -19,9 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-
-#include LZ78Compressor.h
-#include LZ78CompressorConfiguration.h
+#include "LZ78Compressor.h"
+#include "../Configuration/LZ78CompressorConfiguration.h"
 
 int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i parametri, output sia un FILE*
 {
@@ -37,27 +36,23 @@ int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i par
     if(inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
-	if(w != NULL) closeBitwiseBufferedFile(w);
+    if(w != NULL) closeBitwiseBufferedFile(w);
         return -1;
     }
     hashTable = hashInitialize();
     if(hashTable == NULL){
-	closeBitwiseBufferedFile(w);
-	return -1;
+    closeBitwiseBufferedFile(w);
+    return -1;
     }
     while(fread(&readByte, 1, 1, inputFile)) //TODO molte fread!
     {
         child = hash_lookup(hashTable, lookupIndex, readByte);
         if(child != -1) lookupIndex = child;
         else
-        { 
-	    //readByte not found in table
-            if(writeBitBuffer(w, lookupIndex, indexLength) == -1){
-		goto exceptionHandler;
-	    }
-	    if(hashInsert(hashTable, lookupIndex, readByte, childIndex) == -1){
-		goto exceptionHandler;
-	    }
+        {
+            //readByte not found in table
+            if(writeBitBuffer(w, lookupIndex, indexLength) == -1) goto exceptionHandler;
+            if(hashInsert(hashTable, lookupIndex, readByte, childIndex) == -1) goto exceptionHandler;
             childIndex++;
             /**
              * If the number of children reaches the next power of 2, the
@@ -71,7 +66,7 @@ int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i par
                 indexLength++; //...the length of the transmitted index is incremented...
                 indexLengthMask = (indexLengthMask << 1) | 1; //...and the next power of 2 to check is set
             }
-           
+
             lookupIndex = readByte; //ascii code of read is read's index. next lookup starts from read.
             if (childIndex == MAX_CHILD)
             {
@@ -82,24 +77,24 @@ int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i par
     }
     //fine file o c'è stato un errore?
     if(feof(inputFile) == 0){
-	errno = EBADFD;
-	return -1;
+    errno = EBADFD;
+    return -1;
     }
 
     if(writeBitBuffer(w, lookupIndex, indexLength) == -1){
-	goto exceptionHandler;
+    goto exceptionHandler;
     }//TODO #! decompressor aaa
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
     if(writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1){
-	goto exceptionHandler;
+    goto exceptionHandler;
     }//Fine file
     closeBitwiseBufferedFile(w);
     return 0;
-    
+
     exceptionHandler:
-	closeBitwiseBufferedFile(w);
-	hashDestroy(hashTable);
-	return -1;
+    closeBitwiseBufferedFile(w);
+    hashDestroy(hashTable);
+    return -1;
 }
