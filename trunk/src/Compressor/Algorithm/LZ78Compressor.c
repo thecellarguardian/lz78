@@ -21,22 +21,22 @@
 
 #include "LZ78Compressor.h"
 #include "../Configuration/LZ78CompressorConfiguration.h"
+#include "../../../lib/BitwiseBufferedFile/BitwiseBufferedFile.h"
 
-int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i parametri, output sia un FILE*
+int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri, output sia un FILE*
 {
     CELL_TYPE childIndex = ROOT_INDEX + 1;
     CELL_TYPE lookupIndex = ROOT_INDEX;
     CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     CELL_TYPE child;
-    struct BitwiseBufferedFile* w = openBitwiseBufferedFile(outputFile, 1);//ATTENZIONE: e se fossero socket? generalizzare a descrittore di file
+    struct BitwiseBufferedFile* w = openBitwiseBufferedFile(NULL, 1, -1, outputFile);
     size_t indexLength = INITIAL_INDEX_LENGTH;
     uint8_t readByte;
-    //size_t readBits = 0;
     LZ78HashTable* hashTable;
     if(inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
-    if(w != NULL) closeBitwiseBufferedFile(w);
+        if(w != NULL) closeBitwiseBufferedFile(w);
         return -1;
     }
     hashTable = hashInitialize();
@@ -67,7 +67,6 @@ int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i par
                 indexLength++; //...the length of the transmitted index is incremented...
                 indexLengthMask = (indexLengthMask << 1) | 1; //...and the next power of 2 to check is set
             }
-
             lookupIndex = readByte; //ascii code of read is read's index. next lookup starts from read.
             if (childIndex == MAX_CHILD)
             {

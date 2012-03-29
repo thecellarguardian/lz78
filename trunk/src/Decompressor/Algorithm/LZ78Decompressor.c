@@ -19,15 +19,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
+#include "LZ78Decompressor.h"
+#include "../../Configuration/LZ78CompressorConfiguration.h"
 
-#include LZ78Decompressor.h
-#include LZ78CompressorConfiguration.h
-
-int decompress(const char* inputFile, FILE* outputFile) //Attenzione: generalizzare a FILE*
+int decompress(FILE* inputFile, FILE* outputFile) //Attenzione: generalizzare a FILE*
 {
     CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
-    struct BitwiseBufferedFile* r = openBitwiseBufferedFile(inputFile, 0);
-    //struct BitwiseBufferedFile* w = openBitwiseBufferedFile(outputFile, 1);//ATTENZIONE: e se fossero socket? generalizzare a descrittore di file
+    struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, 0, -1, inputFile);
     CELL_TYPE currentIndex;
     CELL_TYPE childIndex = ROOT_INDEX + 1;
     size_t indexLength = INITIAL_INDEX_LENGTH;
@@ -45,10 +43,7 @@ int decompress(const char* inputFile, FILE* outputFile) //Attenzione: generalizz
     while(r->emptyFile == 0)
     {
         if(readBitBuffer(r, &currentIndex, indexLength) == -1) goto exceptionHandler;
-        if(currentIndex == ROOT_INDEX)
-        {
-            break;
-        }
+        if(currentIndex == ROOT_INDEX) break;
         result = table[currentIndex].word;
         length = table[currentIndex].length;
         if(fwrite(result, 1, length, outputFile) != length)

@@ -19,4 +19,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
- int decompress(const char* inputFile, FILE* outputFile);
+int decompress(const char* inputFile, FILE* outputFile);

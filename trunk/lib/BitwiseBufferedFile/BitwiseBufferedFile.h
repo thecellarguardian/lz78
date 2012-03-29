@@ -25,13 +25,22 @@
 /**
  * @brief BitwiseBufferedFile open function
  *
- * This function creates a new BitwiseBufferedFile structure set according to
- * the passed mode. If O_WRONLY is passed and the specified file does not exist,
+ * This function creates a new BitwiseBufferedFile structure. The related file
+ * could be specified, in descending order of priority, by path, by file
+ * descriptor or through the related FILE structure. When pathToFile is set,
+ * the mode parameter defines the opening mode.
+ * If O_WRONLY is passed and the specified file does not exist,
  * it is also created.
  * @param path The path of the file to open.
  * @param mode O_RDONLY (read only) or O_WRONLY (write only).
  **/
-struct BitwiseBufferedFile* openBitwiseBufferedFile(const char* path, int mode);
+struct BitwiseBufferedFile* openBitwiseBufferedFile
+(
+    const char* pathToFile, // NULL, if you want to specify the file by file descriptor or FILE struct
+    int mode // unmeaningful if pathToFile is NULL
+    int fileDescriptorToSet, // -1 if you want to specify the file by FILE struct
+    FILE* fileToSet
+);
 
 /**
  * @brief BitwiseBufferedFile close function

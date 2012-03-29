@@ -19,6 +19,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#include BitwiseBufferedFile.h
-
-int compress(const char* inputFile, const char* outputFile);
+int compress(FILE* inputFile, const char* outputFile);
