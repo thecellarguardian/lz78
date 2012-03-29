@@ -40,9 +40,10 @@ int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i par
         return -1;
     }
     hashTable = hashInitialize();
-    if(hashTable == NULL){
-    closeBitwiseBufferedFile(w);
-    return -1;
+    if(hashTable == NULL)
+    {
+        closeBitwiseBufferedFile(w);
+        return -1;
     }
     while(fread(&readByte, 1, 1, inputFile)) //TODO molte fread!
     {
@@ -76,25 +77,22 @@ int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i par
         }
     }
     //fine file o c'è stato un errore?
-    if(feof(inputFile) == 0){
-    errno = EBADFD;
-    return -1;
+    if(feof(inputFile) == 0)
+    {
+        errno = EBADFD;
+        return -1;
     }
-
-    if(writeBitBuffer(w, lookupIndex, indexLength) == -1){
-    goto exceptionHandler;
-    }//TODO #! decompressor aaa
+    if(writeBitBuffer(w, lookupIndex, indexLength) == -1) goto exceptionHandler;
+    //TODO #! decompressor aaa
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
-    if(writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1){
-    goto exceptionHandler;
-    }//Fine file
+    if(writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1) goto exceptionHandler;
     closeBitwiseBufferedFile(w);
     return 0;
 
     exceptionHandler:
-    closeBitwiseBufferedFile(w);
-    hashDestroy(hashTable);
-    return -1;
+        closeBitwiseBufferedFile(w);
+        hashDestroy(hashTable);
+        return -1;
 }
