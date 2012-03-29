@@ -294,7 +294,7 @@ ssize_t writeBitBuffer
         }
         data >>= bitsToBeWritten;
     }
-    return length;
+    return 0;
 }
 
 #if 1

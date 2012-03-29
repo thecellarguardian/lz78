@@ -37,19 +37,27 @@ int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i par
     if(inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
+	if(w != NULL) closeBitwiseBufferedFile(w);
         return -1;
     }
-    hashTable = hashInitialize();//TODO inizializzazione hash_table
-    if(hashTable == NULL) goto exceptionHandler;
+    hashTable = hashInitialize();
+    if(hashTable == NULL){
+	closeBitwiseBufferedFile(w);
+	return -1;
+    }
     while(fread(&readByte, 1, 1, inputFile))
     {
-        //readBits += fread(r, &readByte, 8);//TODO gestione errori + byte per byte
-        child = hash_lookup(hashTable, lookupIndex, readByte); //TODO
+        child = hash_lookup(hashTable, lookupIndex, readByte);
         if(child != -1) lookupIndex = child;
         else
-        { //read not found in table
-            writeBitBuffer(w, lookupIndex, indexLength); //TODO gestione errori
-            hashInsert(hashTable, lookupIndex, readByte, childIndex);//TODO funzione
+        { 
+	    //readByte not found in table
+            if(writeBitBuffer(w, lookupIndex, indexLength) == -1){
+		goto exceptionHandler;
+	    }
+	    if(hashInsert(hashTable, lookupIndex, readByte, childIndex) == -1){
+		goto exceptionHandler;
+	    }
             childIndex++;
             /**
              * If the number of children reaches the next power of 2, the
@@ -63,26 +71,35 @@ int compress(FILE* inputFile, const char* outputFile)//TODO: simmetrizzare i par
                 indexLength++; //...the length of the transmitted index is incremented...
                 indexLengthMask = (indexLengthMask << 1) | 1; //...and the next power of 2 to check is set
             }
-            //lookupIndex = ROOT_INDEX;
+           
             lookupIndex = readByte; //ascii code of read is read's index. next lookup starts from read.
             if (childIndex == MAX_CHILD)
             {
-              hashReset(hashTable);//TODO
+              hashReset(hashTable);
               childIndex = ROOT_INDEX + 1;
             }
         }
     }
     //fine file o c'è stato un errore?
     if(feof(inputFile) == 0){
-    errno = EBADFD;
-    return -1;
+	errno = EBADFD;
+	return -1;
     }
 
-    writeBitBuffer(w, lookupIndex, indexLength); //TODO gestione errori + #! decompressor aaa radius
+    if(writeBitBuffer(w, lookupIndex, indexLength) == -1){
+	goto exceptionHandler;
+    }//TODO #! decompressor aaa
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
-    writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH); //Fine file
+    if(writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1){
+	goto exceptionHandler;
+    }//Fine file
     closeBitwiseBufferedFile(w);
     return 0;
+    
+    exceptionHandler:
+	closeBitwiseBufferedFile(w);
+	hashDestroy(hashTable);
+	return -1;
 }
