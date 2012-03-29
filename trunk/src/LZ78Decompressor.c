@@ -23,18 +23,19 @@
 #include LZ78Decompressor.h
 #include LZ78CompressorConfiguration.h
 
-int decompress(const char* inputFile, const char* outputFile)
+int decompress(const char* inputFile, FILE* outputFile)
 {
     CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(inputFile, 0);
-    struct BitwiseBufferedFile* w = openBitwiseBufferedFile(outputFile, 1);//ATTENZIONE: e se fossero socket? generalizzare a descrittore di file
-    CELL_TYPE current_index;
-    CELL_TYPE child_index = ROOT_INDEX + 1;
+    //struct BitwiseBufferedFile* w = openBitwiseBufferedFile(outputFile, 1);//ATTENZIONE: e se fossero socket? generalizzare a descrittore di file
+    CELL_TYPE currentIndex;
+    CELL_TYPE childIndex = ROOT_INDEX + 1;
     ssize_t bitsRead = 0;
     size_t indexLength = INITIAL_INDEX_LENGTH;
     uint8_t* result;
     ssize_t index = 0;
     CELL_TYPE length = 0;
+    int notFirstOccurence = 0;
     
     struct node table [MAX_CHILD];
     
@@ -43,40 +44,39 @@ int decompress(const char* inputFile, const char* outputFile)
         return -1;
     }
     
-    //TODO inizializzazione table
+    tableInitialize(table);//TODO inizializzazione table
    
     while(r->emptyFile == 0)
     {
-	bitsRead += readBitBuffer(r, &current_index, indexLength);//TODO gestione errori + byte per byte
-	if(current_index == ROOT_INDEX){
+	bitsRead += readBitBuffer(r, &currentIndex, indexLength);//TODO gestione errori + byte per byte
+	if(currentIndex == ROOT_INDEX){
 	    break;
 	}
-	result = table[current_index].word; //TODO gestione errori
-	length = table[current_index].length;
+	result = table[currentIndex].word; //TODO gestione errori
+	length = table[currentIndex].length;
 	for(index = 0; index < length; index ++){
-	    writeBitBuffer(w, result+index, 8); //TODO FUNZIONE CHE FA A BYTE
+	    fwrite(w, result+index, 8); //TODO FUNZIONE CHE FA A BYTE
 	}
 
-	table[child_index].father = current_index;
-	table[child_index].length = length++;
-	table[child_index].word = malloc(length); //TODO gestire errore
-	bcopy(...);
+	table[childIndex].father = currentIndex;
+	table[childIndex].length = length + 1;
+	table[childIndex].word = malloc(length + 1); //TODO gestire errore
+	bcopy(result,table[childIndex].word,length);
 	
 	//aggiornamento del precedente, la prima volta non va fatto
-	if(...){
-	    table[child_index-1].symbol = ***;
-	    table[child_index-1].word = ***;
+	if(notFirstOccurence){
+	    table[childIndex - 1].symbol = *result;
+	    table[childIndex - 1].word[table[childIndex - 1].lenght - 1] = *result;
 	}
-	
-	//......
-	child_index ++;
-	if(child_index == MAX_CHILD){
-	    table_reset(table);//TODO
-            child_index = ROOT_INDEX + 1;
+
+	childIndex ++;
+	if(childIndex == MAX_CHILD){
+	    tableReset(table);//TODO
+            childIndex = ROOT_INDEX + 1;
 	}
 	
     }
     
-    return 1;
+    return 0;
    
 }

@@ -23,33 +23,33 @@
 #include LZ78Compressor.h
 #include LZ78CompressorConfiguration.h
 
-int compress(const char* inputFile, const char* outputFile)
+int compress(FILE* inputFile, const char* outputFile)
 {
     CELL_TYPE childIndex = ROOT_INDEX + 1;
     CELL_TYPE lookupIndex = ROOT_INDEX;
     CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     CELL_TYPE child;
-    struct BitwiseBufferedFile* r = openBitwiseBufferedFile(inputFile, 0);
+    //struct BitwiseBufferedFile* r = openBitwiseBufferedFile(inputFile, 0);
     struct BitwiseBufferedFile* w = openBitwiseBufferedFile(outputFile, 1);//ATTENZIONE: e se fossero socket? generalizzare a descrittore di file
     size_t indexLength = INITIAL_INDEX_LENGTH;
-    uint8_t read;
-    ssize_t readBits = 0;
-    LZ78HashTable* hash_table;
-    if(r == NULL || w == NULL)
+    uint8_t readByte;
+    //size_t readBits = 0;
+    LZ78HashTable* hashTable;
+    if(inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
         return -1;
     }
-    hash_table = hash_initialize();//TODO inizializzazione hash_table
-    while(r->emptyFile == 0)
+    hashTable = hashInitialize();//TODO inizializzazione hash_table
+    while(fread(&readByte, 1, 1, inputFile))
     {
-        readBits += readBitBuffer(r, &read, 8);//TODO gestione errori + byte per byte
-        child = hash_lookup(hash_table, lookupIndex, read); //TODO
+        //readBits += fread(r, &readByte, 8);//TODO gestione errori + byte per byte
+        child = hash_lookup(hashTable, lookupIndex, readByte); //TODO
         if(child != -1) lookupIndex = child;
         else
         { //read not found in table
             writeBitBuffer(w, lookupIndex, indexLength); //TODO gestione errori
-            hash_insert(hash_table, lookupIndex, read, childIndex);//TODO funzione
+            hashInsert(hashTable, lookupIndex, readByte, childIndex);//TODO funzione
             childIndex++;
             /**
              * If the number of children reaches the next power of 2, the
@@ -64,19 +64,25 @@ int compress(const char* inputFile, const char* outputFile)
                 indexLengthMask = (indexLengthMask << 1) | 1; //...and the next power of 2 to check is set
             }
             //lookupIndex = ROOT_INDEX;
-            lookupIndex = read; //ascii code of read is read's index. next lookup starts from read.
+            lookupIndex = readByte; //ascii code of read is read's index. next lookup starts from read.
             if (childIndex == MAX_CHILD)
             {
-              hash_reset(hash_table);//TODO
+              hashReset(hashTable);//TODO
               childIndex = ROOT_INDEX + 1;
             }
         }
     }
+    //fine file o c'è stato un errore?
+    if(feof(inputFile) == 0){
+	errno = EBADFD;
+	return -1;
+    }
+    
     writeBitBuffer(w, lookupIndex, indexLength); //TODO gestione errori + #! decompressor aaa radius
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
     writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH); //Fine file
     closeBitwiseBufferedFile(r);
-    return readBits;
+    return 0;
 }
