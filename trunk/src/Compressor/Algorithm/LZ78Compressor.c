@@ -47,9 +47,10 @@ int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri
         closeBitwiseBufferedFile(w);
         return -1;
     }
-    if //OR short circuit evaluation exploited
+    if //OR short circuit evaluation exploited to write the interpreter directive
     (
-        fputs(LZ78_INTERPRETER_DIRECTIVE, outputFile) == EOF ||
+        fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) == EOF
+        ||
         fflush(outputFile) == EOF
     ) goto exceptionHandler;
     while(feof(inputFile) & !ferror(inputFile)) //TODO molte fread!
