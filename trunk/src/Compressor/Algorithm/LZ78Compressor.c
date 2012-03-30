@@ -23,7 +23,7 @@
 #include "../Configuration/LZ78CompressorConfiguration.h"
 #include "../../../lib/BitwiseBufferedFile/BitwiseBufferedFile.h"
 
-int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri, output sia un FILE*
+int compress(FILE* inputFile, FILE* outputFile)
 {
     struct BitwiseBufferedFile* w = openBitwiseBufferedFile(NULL, 1, -1, outputFile);
     uint8_t readByte[LOCAL_BYTE_BUFFER_LENGTH];
@@ -75,12 +75,15 @@ int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri
                     ) == -1
                 ) goto exceptionHandler;
                 childIndex++;
-                if(childIndex & indexLengthMask == 0) //if the next power of 2 is reached...
+                if(childIndex & indexLengthMask == 0) //A power of 2 is reached
                 {
-                    indexLength++; //...the length of the transmitted index is incremented by one...
-                    indexLengthMask = (indexLengthMask << 1) | 1; //...and the next power of 2 to check is set
+                    //The length of the transmitted index is incremented
+                    indexLength++;
+                    //The next power of 2 mask is set
+                    indexLengthMask = (indexLengthMask << 1) | 1;
                 }
-                lookupIndex = readByte; //ascii code of readByte is readByte's index. The next lookup starts from readByte.
+                //readByte value is also the right index to start with next time
+                lookupIndex = readByte;
                 if (childIndex == MAX_CHILD)
                 {
                     hashReset(hashTable);
@@ -107,7 +110,8 @@ int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri
     return 0;
 
     /**
-     * "With great power there must also come -- great responsibility!" (Stan Lee)
+     * "With great power there must also come great responsibility!"
+     * (Stan Lee)
      **/
     exceptionHandler:
         closeBitwiseBufferedFile(w);
