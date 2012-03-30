@@ -47,6 +47,11 @@ int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri
         closeBitwiseBufferedFile(w);
         return -1;
     }
+    if //OR short circuit evaluation exploited
+    (
+        fputs(LZ78_INTERPRETER_DIRECTIVE, outputFile) == EOF ||
+        fflush(outputFile) == EOF
+    ) goto exceptionHandler;
     while(feof(inputFile) & !ferror(inputFile)) //TODO molte fread!
     {
         bufferedBytes = fread(readByte, 1, 8, inputFile);
@@ -94,7 +99,7 @@ int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri
         ||
         writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1
     ) goto exceptionHandler;
-    //TODO #! decompressor aaa
+    //TODO #!/usr/bin/env lz78
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
