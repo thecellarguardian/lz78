@@ -47,7 +47,7 @@ int compress(FILE* inputFile, FILE* outputFile)
         closeBitwiseBufferedFile(w);
         return -1;
     }
-    if //OR short circuit evaluation exploited to write the interpreter directive
+    if //OR short circuit exploited to write the interpreter directive
     (
         fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) == EOF
         ||
