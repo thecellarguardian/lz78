@@ -31,8 +31,10 @@
  * the mode parameter defines the opening mode.
  * If O_WRONLY is passed and the specified file does not exist,
  * it is also created.
- * @param path The path of the file to open.
+ * @param path The pathToFile of the file to open, or NULL to use other opening techniques.
  * @param mode O_RDONLY (read only) or O_WRONLY (write only).
+ * @param fileDescriptorToSet The referred file descriptor, the file must be opened according to mode or be -1 to use other opening techniques.
+ * @param fileToSet The referred file FILE struct pointer, the file must be opened according to mode or be NULL to use other opening techniques.
  **/
 struct BitwiseBufferedFile* openBitwiseBufferedFile
 (

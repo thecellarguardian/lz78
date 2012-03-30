@@ -19,4 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-int compress(FILE* inputFile, const char* outputFile);
+#include <stdio.h>
+
+int compress(FILE* inputFile, FILE* outputFile);

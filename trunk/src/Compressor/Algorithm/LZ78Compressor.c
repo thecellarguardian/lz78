@@ -25,14 +25,16 @@
 
 int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri, output sia un FILE*
 {
+    struct BitwiseBufferedFile* w = openBitwiseBufferedFile(NULL, 1, -1, outputFile);
+    uint8_t readByte[LOCAL_BYTE_BUFFER_LENGTH];
+    size_t indexLength = INITIAL_INDEX_LENGTH;
+    size_t bufferedBytes;
+    int byteIndex = 0;
+    LZ78HashTable* hashTable;
     CELL_TYPE childIndex = ROOT_INDEX + 1;
     CELL_TYPE lookupIndex = ROOT_INDEX;
     CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     CELL_TYPE child;
-    struct BitwiseBufferedFile* w = openBitwiseBufferedFile(NULL, 1, -1, outputFile);
-    size_t indexLength = INITIAL_INDEX_LENGTH;
-    uint8_t readByte;
-    LZ78HashTable* hashTable;
     if(inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
@@ -45,51 +47,72 @@ int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri
         closeBitwiseBufferedFile(w);
         return -1;
     }
-    while(fread(&readByte, 1, 1, inputFile)) //TODO molte fread!
+    while(feof(inputFile) & !ferror(inputFile)) //TODO molte fread!
     {
-        child = hash_lookup(hashTable, lookupIndex, readByte);
-        if(child != -1) lookupIndex = child;
-        else
+        bufferedBytes = fread(readByte, 1, 8, inputFile);
+        for(byteIndex = 0; byteIndex < bufferedBytes; i++)
         {
-            //readByte not found in table
-            if(writeBitBuffer(w, lookupIndex, indexLength) == -1) goto exceptionHandler;
-            if(hashInsert(hashTable, lookupIndex, readByte, childIndex) == -1) goto exceptionHandler;
-            childIndex++;
-            /**
-             * If the number of children reaches the next power of 2, the
-             * related index length must be incremented by one.
-             * In order to index k children, log_2(k) bits are sufficient, so
-             * the index transmitted to the decompressor is log_2(k) long, no
-             * more.
-             **/
-            if(childIndex & indexLengthMask == 0) //if the next power of 2 is reached...
+            child = hashLookup(hashTable, lookupIndex, readByte[byteIndex]);
+            if(child != -1) lookupIndex = child;
+            else
             {
-                indexLength++; //...the length of the transmitted index is incremented...
-                indexLengthMask = (indexLengthMask << 1) | 1; //...and the next power of 2 to check is set
-            }
-            lookupIndex = readByte; //ascii code of read is read's index. next lookup starts from read.
-            if (childIndex == MAX_CHILD)
-            {
-              hashReset(hashTable);
-              childIndex = ROOT_INDEX + 1;
+                //OR short circuit evaluation exploited in the next statement
+                if
+                (
+                    writeBitBuffer(w, lookupIndex, indexLength) == -1
+                    ||
+                    hashInsert
+                    (
+                        hashTable,
+                        lookupIndex,
+                        readByte[byteIndex],
+                        childIndex
+                    ) == -1
+                ) goto exceptionHandler;
+                childIndex++;
+                /**
+                 * If the number of children reaches the next power of 2, the
+                 * related index length must be incremented by one.
+                 * In order to index k children, log_2(k) bits are sufficient,
+                 * so the index transmitted to the decompressor is log_2(k)
+                 * long, no more.
+                 **/
+                if(childIndex & indexLengthMask == 0) //if the next power of 2 is reached...
+                {
+                    indexLength++; //...the length of the transmitted index is incremented...
+                    indexLengthMask = (indexLengthMask << 1) | 1; //...and the next power of 2 to check is set
+                }
+                lookupIndex = readByte; //ascii code of readByte is readByte's index. The next lookup starts from readByte.
+                if (childIndex == MAX_CHILD)
+                {
+                    hashReset(hashTable);
+                    childIndex = ROOT_INDEX + 1;
+                }
             }
         }
     }
     //fine file o c'è stato un errore?
-    if(feof(inputFile) == 0)
+    if(ferror(inputFile))
     {
         errno = EBADFD;
         return -1;
     }
-    if(writeBitBuffer(w, lookupIndex, indexLength) == -1) goto exceptionHandler;
+    if
+    (
+        writeBitBuffer(w, lookupIndex, indexLength) == -1
+        ||
+        writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1
+    ) goto exceptionHandler;
     //TODO #! decompressor aaa
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
-    if(writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1) goto exceptionHandler;
     closeBitwiseBufferedFile(w);
     return 0;
 
+    /**
+     * "With great power there must also come -- great responsibility!" (Stan Lee)
+     **/
     exceptionHandler:
         closeBitwiseBufferedFile(w);
         hashDestroy(hashTable);

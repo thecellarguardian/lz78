@@ -1,5 +1,5 @@
 /**
- * @file LZ78Compressor_configuration.h
+ * @file LZ78CompressorConfiguration.h
  * @author Cosimo Sacco <cosimosacco@gmail.com>
  * @author Davide Silvestri <davidesil.web@gmail.com>
  *
@@ -22,6 +22,6 @@
 #define ROOT_INDEX 256//TODO: DEVE essere 256, altrimenti non funziona nulla (vedi tableCreate)
 #define INITIAL_INDEX_LENGTH 9 //log_2(ROOT_INDEX)
 #define FINAL_INDEX_LENGTH 16 //log_2(MAX_CHILD)
-#define INDEX_LENGTH_MASK 511 //111111111
+#define INDEX_LENGTH_MASK 511 //111111111 (INITIAL_INDEX_LENGTH ones)
 #define MAX_CHILD 65535
-
+#define LOCAL_BYTE_BUFFER_LENGTH 64
