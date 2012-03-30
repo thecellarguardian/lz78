@@ -56,8 +56,7 @@ int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri
             if(child != -1) lookupIndex = child;
             else
             {
-                //OR short circuit evaluation exploited in the next statement
-                if
+                if //OR short circuit evaluation exploited
                 (
                     writeBitBuffer(w, lookupIndex, indexLength) == -1
                     ||
@@ -70,16 +69,9 @@ int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri
                     ) == -1
                 ) goto exceptionHandler;
                 childIndex++;
-                /**
-                 * If the number of children reaches the next power of 2, the
-                 * related index length must be incremented by one.
-                 * In order to index k children, log_2(k) bits are sufficient,
-                 * so the index transmitted to the decompressor is log_2(k)
-                 * long, no more.
-                 **/
                 if(childIndex & indexLengthMask == 0) //if the next power of 2 is reached...
                 {
-                    indexLength++; //...the length of the transmitted index is incremented...
+                    indexLength++; //...the length of the transmitted index is incremented by one...
                     indexLengthMask = (indexLengthMask << 1) | 1; //...and the next power of 2 to check is set
                 }
                 lookupIndex = readByte; //ascii code of readByte is readByte's index. The next lookup starts from readByte.
@@ -91,11 +83,10 @@ int compress(FILE* inputFile, FILE* outputFile)//TODO: simmetrizzare i parametri
             }
         }
     }
-    //fine file o c'è stato un errore?
     if(ferror(inputFile))
     {
         errno = EBADFD;
-        return -1;
+        goto exceptionHandler; //TODO: siamo sicuri???
     }
     if
     (
