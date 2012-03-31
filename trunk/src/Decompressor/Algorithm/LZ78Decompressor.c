@@ -24,14 +24,14 @@
 
 int decompress(FILE* inputFile, FILE* outputFile) //Attenzione: generalizzare a FILE*
 {
-    CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, 0, -1, inputFile);
-    CELL_TYPE currentIndex;
-    CELL_TYPE childIndex = ROOT_INDEX + 1;
+    CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     size_t indexLength = INITIAL_INDEX_LENGTH;
-    uint8_t* result;
-    CELL_TYPE length = 0;
+    CELL_TYPE childIndex = ROOT_INDEX + 1;
     int notFirstOccurence = 0;
+    CELL_TYPE currentIndex;
+    CELL_TYPE length = 0;
+    uint8_t* result;
     struct Node table[MAX_CHILD];
     if(r == NULL || outputFile == NULL)
     {
