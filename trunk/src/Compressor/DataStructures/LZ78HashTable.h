@@ -24,6 +24,10 @@
 
 struct LZ78HashTable* hashInitialize();
 
-CELL_TYPE hashLookup(struct LZ78HashTable*, CELL_TYPE, uint8_t*);
+INDEX_TYPE hashLookup(struct LZ78HashTable*, INDEX_TYPE, uint8_t*);
 
-int hashInsert(struct LZ78HashTable*, CELL_TYPE, uint8_t*, CELL_TYPE);
+int hashInsert(struct LZ78HashTable*, INDEX_TYPE, uint8_t*, INDEX_TYPE);
+
+int hashReset(struct LZ78HashTable*);
+
+void hashDestroy(struct LZ78HashTable*);

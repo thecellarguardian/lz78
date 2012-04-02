@@ -87,7 +87,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                 lookupIndex = readByte;
                 if (childIndex == MAX_CHILD)
                 {
-                    hashReset(hashTable);
+                    hashReset(hashTable); //TODO controllare errore
                     childIndex = ROOT_INDEX + 1;
                 }
             }
