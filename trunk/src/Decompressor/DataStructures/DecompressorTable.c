@@ -29,9 +29,11 @@ struct Node
     CELL_TYPE length; // worst case = tree levels
 };
 
+//TODO if table!= null ovunque??
+
 void tableDestroy(Node* table)
 {
-    int = MAX_CHILD - 1;
+    int i = MAX_CHILD - 1;
     for(; i--;) free(table[i].word);
     bzero(table, sizeof(struct Node) * MAX_CHILD);
     free(table);

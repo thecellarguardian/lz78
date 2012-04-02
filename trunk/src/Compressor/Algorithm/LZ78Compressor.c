@@ -60,7 +60,7 @@ int compress(FILE* inputFile, FILE* outputFile)
         for(byteIndex = 0; byteIndex < bufferedBytes; i++)
         {
             child = hashLookup(hashTable, lookupIndex, readByte[byteIndex]);
-            if(child != -1) lookupIndex = child;
+            if(child != ROOT_INDEX) lookupIndex = child; //TODO giusto usare root_index?
             else
             {
                 if //OR short circuit evaluation exploited

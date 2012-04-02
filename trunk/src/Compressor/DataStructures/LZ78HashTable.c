@@ -67,7 +67,7 @@ INDEX_TYPE* hashInitialize{
     uint8_t currentValue = ROOT_INDEX - 1;
     if(tableToReturn != NULL)
     {
-	 for(; i--;)
+	for(; i--;)
         {
 	    tableToReturn[i] = ROOT_INDEX; //inizializza a un valore di default = nodo vuoto
         }
@@ -84,6 +84,7 @@ INDEX_TYPE* hashInitialize{
 	return NULL;
 }
 
+//TODO if table!= null ovunque??
 
 int hashInsert(INDEX_TYPE* table, INDEX_TYPE fatherIndex, uint8_t* childValue, INDEX_TYPE childIndex){
     if(tabletoReturn[fHash(fatherIndex,childValue)] != ROOT_INDEX)
@@ -92,8 +93,32 @@ int hashInsert(INDEX_TYPE* table, INDEX_TYPE fatherIndex, uint8_t* childValue, I
     return 0;
 }
 
-INDEX_TYPE hashLookup(INDEX_TYPE* LZ78HashTable, INDEX_TYPE, uint8_t*);
+INDEX_TYPE hashLookup(INDEX_TYPE* LZ78HashTable, INDEX_TYPE fatherIndex, uint8_t* childValue){ //TODO inline?
+    return fHash(fatherIndex,childValue);
+}
 
-int hashReset(INDEX_TYPE*);
+int hashReset(INDEX_TYPE*){ //TODO metodo + efficiente??   
+    int i = HASH_TABLE_LENGTH - 1;
+    uint8_t currentValue = ROOT_INDEX - 1;
+    
+    for(; i--;)
+     {
+	tableToReturn[i] = ROOT_INDEX; //inizializza a un valore di default = nodo vuoto
+     }
+     for(; currentValue--;) //i caratteri ascii coincidono con il loro indice
+     {
+	if(hashInsert(tableToReturn, ROOT_INDEX, &currentValue, currentValue) == -1)
+	    goto exceptionHandler;
+     }    
+     
+    return 0;
+      
+    exceptionHandler:
+	hashDestroy();
+	return -1;
+}
 
-void hashDestroy(INDEX_TYPE*);
+void hashDestroy(INDEX_TYPE* table){
+    bzero(table, HASH_TABLE_LENGTH);
+    free(table);
+}
