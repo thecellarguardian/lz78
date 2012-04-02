@@ -54,7 +54,7 @@ int compress(FILE* inputFile, FILE* outputFile)
         ||
         fflush(outputFile) == EOF
     ) goto exceptionHandler;
-    while(feof(inputFile) & !ferror(inputFile)) //TODO molte fread!
+    while(feof(inputFile) & !ferror(inputFile))
     {
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
         for(byteIndex = 0; byteIndex < bufferedBytes; i++)
@@ -84,7 +84,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                     indexLengthMask = (indexLengthMask << 1) | 1;
                 }
                 //readByte value is also the right index to start with next time
-                lookupIndex = readByte;
+                lookupIndex = readByte[byteIndex];
                 if (childIndex == MAX_CHILD)
                 {
                     hashReset(hashTable); //TODO controllare errore
