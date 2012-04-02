@@ -20,6 +20,7 @@
  **/
 
 #include "LZ78Compressor.h"
+#include "../DataStructures/LZ78HashTable.h"
 #include "../Configuration/LZ78CompressorConfiguration.h"
 #include "../../../lib/BitwiseBufferedFile/BitwiseBufferedFile.h"
 
@@ -49,13 +50,13 @@ int compress(FILE* inputFile, FILE* outputFile)
     }
     if //OR short circuit exploited to write the interpreter directive
     (
-        fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) == EOF
+        fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) < sizeof(LZ78_INTERPRETER)
         ||
         fflush(outputFile) == EOF
     ) goto exceptionHandler;
     while(feof(inputFile) & !ferror(inputFile)) //TODO molte fread!
     {
-        bufferedBytes = fread(readByte, 1, 8, inputFile);
+        bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
         for(byteIndex = 0; byteIndex < bufferedBytes; i++)
         {
             child = hashLookup(hashTable, lookupIndex, readByte[byteIndex]);
