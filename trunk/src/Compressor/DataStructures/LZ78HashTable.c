@@ -52,16 +52,19 @@ int hashInsert
     INDEX_TYPE childIndex
 ) //TODO inline??
 {
-    struct LZ78HashTableEntry* result;
-    do
+    //è tutto molto lento, inoltre gli INDEX_TYPE sono un casino, non è proprio
+    //bello che siano uguali ai CELL_TYPE
+    INDEX_TYPE index = hashFunction(fatherIndex, *childValue);
+    INDEX_TYPE i = 0;
+    while(table[index].childIndex != ROOT_INDEX && i < MAX_CHILD*2) //lento
     {
-        result = table + hashFunction(fatherIndex, *childValue);
+        index = (index + 1)%(MAX_CHILD*2); //lento
+        i++;
     }
-    while(result->childIndex != ROOT_INDEX && result < table + MAX_CHILD*2);
-    if(result->childIndex != ROOT_INDEX) return -1; //collisione
-    result->childIndex = childIndex;
-    result->fatherIndex = fatherIndex;
-    result->childValue = *childValue;
+    if(table[index] != ROOT_INDEX) return -1;
+    table[index].childIndex = childIndex; //lento
+    table[index].fatherIndex = fatherIndex; //lento
+    table[index].childValue = *childValue; //lento
     return 0;
 }
 
@@ -111,19 +114,24 @@ INDEX_TYPE hashLookup
 ) //TODO inline?
 {
     struct LZ78HashTableEntry* result;
-    do result = table + hashFunction(fatherIndex, *childValue);
+    INDEX_TYPE index = hashFunction(fatherIndex, *childValue);
+    INDEX_TYPE i = 0;
     while
     (
-        result->childValue  != *childValue &&
-        result->fatherIndex != fatherIndex &&
-        result < table + MAX_CHILD*2
-    );
+        table[index].childValue  != *childValue && //lento
+        table[index].fatherIndex != fatherIndex && //lento
+        i < MAX_CHILD*2
+    )
+    {
+        index = (index + 1)%(MAX_CHILD*2); //lento
+        i++;
+    }
     return
     (
-        result->childValue  == *childValue &&
-        result->fatherIndex == fatherIndex
+        table[index].childValue  == *childValue && //lento
+        table[index].fatherIndex == fatherIndex //lento
     )?
-        result->childIndex : ROOT_INDEX;
+        table[index].childIndex : ROOT_INDEX; //lento
 }
 
 void hashDestroy(struct LZ78HashTableEntry* table){
