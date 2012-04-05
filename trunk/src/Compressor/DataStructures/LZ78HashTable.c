@@ -21,10 +21,6 @@
 
 #include "LZ78HashTable.h"
 
-
-/*
-A COSA SERVE? A NIENTE!
-
 struct LZ78HashTableEntry
 {
     //key:
@@ -34,6 +30,8 @@ struct LZ78HashTableEntry
     INDEX_TYPE childIndex;
 };
 
+
+/*
 struct LZ78HashTableEntry* hashInitialize(){
     struct LZ78HashTableEntry* tableToReturn = calloc(HASH_TABLE_LENGTH, sizeof(struct LZ78HashTableEntry));
     uint8_t i = ROOT_INDEX-1;
@@ -61,16 +59,12 @@ int hashReset(struct LZ78HashTableEntry*);
 void hashDestroy(struct LZ78HashTableEntry*);*/
 
 
-INDEX_TYPE* hashInitialize{
-    INDEX_TYPE* tableToReturn = malloc(HASH_TABLE_LENGTH);
-    int i = HASH_TABLE_LENGTH - 1;
+LZ78HashTableEntry* hashInitialize(){
+    LZ78HashTableEntry* tableToReturn = malloc(HASH_TABLE_LENGTH);
+    //int i = HASH_TABLE_LENGTH - 1;
     uint8_t currentValue = ROOT_INDEX - 1;
     if(tableToReturn != NULL)
     {
-	for(; i--;)
-        {
-	    tableToReturn[i] = ROOT_INDEX; //inizializza a un valore di default = nodo vuoto
-        }
         for(; currentValue--;) //i caratteri ascii coincidono con il loro indice
         {
 	    if(hashInsert(tableToReturn, ROOT_INDEX, &currentValue, currentValue) == -1)
@@ -87,9 +81,9 @@ INDEX_TYPE* hashInitialize{
 //TODO if table!= null ovunque??
 
 int hashInsert(INDEX_TYPE* table, INDEX_TYPE fatherIndex, uint8_t* childValue, INDEX_TYPE childIndex){
-    if(tabletoReturn[fHash(fatherIndex,childValue)] != ROOT_INDEX)
+    if(table[fHash(fatherIndex,childValue)] != ROOT_INDEX)
 	return -1; //collisione
-    tabletoReturn[fHash(fatherIndex,childValue)] = childIndex; //TODO inline??
+    table[fHash(fatherIndex,childValue)] = childIndex; //TODO inline??
     return 0;
 }
 

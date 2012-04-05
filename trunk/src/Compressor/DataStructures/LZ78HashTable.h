@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "../../../lib/BitwiseBufferedFile/bufferConfiguration.h"
 
-#define HASH_TABLE_LENGTH MAX_CHILD * 2
+#define HASH_TABLE_LENGTH MAX_CHILD * 2 * sizeof(struct LZ78HashTableEntry)
 
 /*struct LZ78HashTableEntry* hashInitialize();
 
