@@ -20,6 +20,7 @@
  **/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <strings.h>
 #include "LZ78HashTable.h"
 #include "../../Configuration/LZ78CompressorConfiguration.h"
@@ -35,10 +36,12 @@ struct LZ78HashTableEntry
 
 INDEX_TYPE hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
 {
+    printf("HASH");
     INDEX_TYPE index = 0;
+    uint8_t* byteKey1 = (uint8_t*)(&key1);
     key1 ^= key2; //TODO migliorare
     int i = sizeof(INDEX_TYPE);
-    for (; i-- ;) index ^= ( index << 5 ) + ( index >> 2 ) + (&key1)[i];
+    for (; i-- ;) index ^= ( index << 5 ) + ( index >> 2 ) + ((INDEX_TYPE)*(&byteKey1)[i]);
     return index;
 }
 
@@ -54,6 +57,7 @@ int hashInsert
 {
     //è tutto molto lento, inoltre gli INDEX_TYPE sono un casino, non è proprio
     //bello che siano uguali ai CELL_TYPE
+    printf("father: %llu\nchildVal: %u, childIndex: %llu", fatherIndex, childValue, childIndex);
     INDEX_TYPE index = hashFunction(fatherIndex, *childValue);
     INDEX_TYPE i = 0;
     while(table[index].childIndex != ROOT_INDEX && i < MAX_CHILD*2) //lento
@@ -70,8 +74,8 @@ int hashInsert
 
 struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
 {
-    int i = HASH_TABLE_LENGTH - 1;
-    uint8_t currentValue = ROOT_INDEX - 1;
+    int i = HASH_TABLE_LENGTH;
+    uint8_t currentValue = 0;
     if(table != NULL)
     {
         for(; i-- ;) table[i].childIndex = ROOT_INDEX;
@@ -92,12 +96,13 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
     return table;
 
     exceptionHandler:
-    hashDestroy(table);
-    return NULL;
+        hashDestroy(table);
+        return NULL;
 }
 
 inline struct LZ78HashTableEntry* hashCreate()
 {
+    printf("aaa");
     return hashInitialize((struct LZ78HashTableEntry*)malloc(HASH_TABLE_LENGTH));
 }
 
