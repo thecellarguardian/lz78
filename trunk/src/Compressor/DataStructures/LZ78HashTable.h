@@ -22,14 +22,19 @@
 #include <stdint.h>
 #include "../../../lib/BitwiseBufferedFile/bufferConfiguration.h"
 
+#define INDEX_TYPE CELL_TYPE
 #define HASH_TABLE_LENGTH MAX_CHILD * 2 * sizeof(struct LZ78HashTableEntry)
 
-LZ78HashTableEntry* hashInitialize();
+struct LZ78HashTableEntry* hashInitialize();
 
-INDEX_TYPE hashLookup(LZ78HashTableEntry*, INDEX_TYPE, uint8_t*);
+struct LZ78HashTableEntry* hashCreate();
 
-int hashInsert(LZ78HashTableEntry*, INDEX_TYPE, uint8_t*, INDEX_TYPE);
+struct LZ78HashTableEntry* hashReset();
 
-int hashReset(LZ78HashTableEntry*);
+INDEX_TYPE hashLookup(struct LZ78HashTableEntry*, INDEX_TYPE, uint8_t*);
 
-void hashDestroy(LZ78HashTableEntry*);
+int hashInsert(struct LZ78HashTableEntry*, INDEX_TYPE, uint8_t*, INDEX_TYPE);
+
+struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry*);
+
+void hashDestroy(struct LZ78HashTableEntry*);
