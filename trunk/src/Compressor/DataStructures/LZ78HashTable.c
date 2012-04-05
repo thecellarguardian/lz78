@@ -24,47 +24,31 @@
 struct LZ78HashTableEntry
 {
     //key:
-    INDEX_TYPE father;
+    INDEX_TYPE fatherIndex;
     uint8_t childValue;
     //value:
     INDEX_TYPE childIndex;
 };
 
-
-/*
-struct LZ78HashTableEntry* hashInitialize(){
-    struct LZ78HashTableEntry* tableToReturn = calloc(HASH_TABLE_LENGTH, sizeof(struct LZ78HashTableEntry));
-    uint8_t i = ROOT_INDEX-1;
-    if(tableToReturn != NULL)
-    {
-        for(; i--;)
-        {
-	    if(hashInsert(tableToReturn, ROOT_INDEX, &i, i))
-		goto exceptionHandler;
-        }
-    }
-    return tableToReturn;
-    
-    exceptionHandler:
-	hashDestroy();
-	return NULL;
+INDEX_TYPE hashFunction(INDEX_TYPE key1, INDEX_TYPE key2){ //SAX hash function
+    INDEX_TYPE index = 0;
+    key1 ^= key2; //TODO migliorare
+    uint8_t i = sizeof(INDEX_TYPE);
+    for (; i -- ;)
+      index ^= ( index << 5 ) + ( index >> 2 ) + &key1[i]; 
+    return index;
 }
 
-INDEX_TYPE hashLookup(struct LZ78HashTableEntry*, INDEX_TYPE, uint8_t*);
-
-int hashInsert(struct LZ78HashTableEntry* table, INDEX_TYPE father, uint8_t* childValue, INDEX_TYPE childIndex);
-
-int hashReset(struct LZ78HashTableEntry*);
-
-void hashDestroy(struct LZ78HashTableEntry*);*/
-
-
 LZ78HashTableEntry* hashInitialize(){
-    LZ78HashTableEntry* tableToReturn = malloc(HASH_TABLE_LENGTH);
-    //int i = HASH_TABLE_LENGTH - 1;
+    LZ78HashTableEntry* tableToReturn = malloc(HASH_TABLE_LENGTH); //TODO vediamo come ottimizzare
+    int i = HASH_TABLE_LENGTH - 1;
     uint8_t currentValue = ROOT_INDEX - 1;
     if(tableToReturn != NULL)
     {
+	for(; i-- ;){
+	    if(hashInsert(tableToReturn, ROOT_INDEX, NULL, ROOT_INDEX) == -1)
+		goto exceptionHandler;
+	}
         for(; currentValue--;) //i caratteri ascii coincidono con il loro indice
         {
 	    if(hashInsert(tableToReturn, ROOT_INDEX, &currentValue, currentValue) == -1)
@@ -80,30 +64,36 @@ LZ78HashTableEntry* hashInitialize(){
 
 //TODO if table!= null ovunque??
 
-int hashInsert(INDEX_TYPE* table, INDEX_TYPE fatherIndex, uint8_t* childValue, INDEX_TYPE childIndex){
-    if(table[fHash(fatherIndex,childValue)] != ROOT_INDEX)
+int hashInsert(LZ78HashTableEntry* table, INDEX_TYPE fatherIndex, uint8_t* childValue, INDEX_TYPE childIndex){ //TODO inline??
+    LZ78HashTableEntry* result = table[hashFunction(table,fatherIndex,*childValue)]; //TODO o si fa per valore o si passa anche fatherIndex per indirizzo
+    if(result->childIndex != ROOT_INDEX)
 	return -1; //collisione
-    table[fHash(fatherIndex,childValue)] = childIndex; //TODO inline??
+    result->childIndex = childIndex;
+    result->fatherIndex = fatherIndex;
+    result->childValue = *childValue;
     return 0;
 }
 
-INDEX_TYPE hashLookup(INDEX_TYPE* LZ78HashTable, INDEX_TYPE fatherIndex, uint8_t* childValue){ //TODO inline?
-    return fHash(fatherIndex,childValue);
+INDEX_TYPE hashLookup(LZ78HashTableEntry* table, INDEX_TYPE fatherIndex, uint8_t* childValue){ //TODO inline?
+    LZ78HashTableEntry* result = table[hashFunction(table,fatherIndex,*childValue)];
+    if(result->childValue == *childValue && result->fatherIndex == fatherIndex)
+	return result->childIndex;
+    return ROOT_INDEX; //TODO come notificare collisione != non presente ??
 }
 
-int hashReset(INDEX_TYPE*){ //TODO metodo + efficiente??   
+int hashReset(LZ78HashTableEntry* table){ //TODO metodo + efficiente??   
     int i = HASH_TABLE_LENGTH - 1;
     uint8_t currentValue = ROOT_INDEX - 1;
     
-    for(; i--;)
-     {
-	tableToReturn[i] = ROOT_INDEX; //inizializza a un valore di default = nodo vuoto
-     }
-     for(; currentValue--;) //i caratteri ascii coincidono con il loro indice
-     {
+    for(; i-- ;){
+	if(hashInsert(tableToReturn, ROOT_INDEX, NULL, ROOT_INDEX) == -1)
+	    goto exceptionHandler;
+    }
+    for(; currentValue--;) //i caratteri ascii coincidono con il loro indice
+    {
 	if(hashInsert(tableToReturn, ROOT_INDEX, &currentValue, currentValue) == -1)
 	    goto exceptionHandler;
-     }    
+    } 
      
     return 0;
       
@@ -112,7 +102,7 @@ int hashReset(INDEX_TYPE*){ //TODO metodo + efficiente??
 	return -1;
 }
 
-void hashDestroy(INDEX_TYPE* table){
+void hashDestroy(LZ78HashTableEntry* table){
     bzero(table, HASH_TABLE_LENGTH);
     free(table);
 }
