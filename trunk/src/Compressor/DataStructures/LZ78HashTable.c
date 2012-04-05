@@ -61,7 +61,7 @@ int hashInsert
         index = (index + 1)%(MAX_CHILD*2); //lento
         i++;
     }
-    if(table[index] != ROOT_INDEX) return -1;
+    if(table[index].childIndex != ROOT_INDEX) return -1;
     table[index].childIndex = childIndex; //lento
     table[index].fatherIndex = fatherIndex; //lento
     table[index].childValue = *childValue; //lento
@@ -98,7 +98,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
 
 inline struct LZ78HashTableEntry* hashCreate()
 {
-    return hashInitialize(malloc(HASH_TABLE_LENGTH));
+    return hashInitialize((struct LZ78HashTableEntry*)malloc(HASH_TABLE_LENGTH));
 }
 
 inline struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry* table)
