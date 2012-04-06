@@ -309,6 +309,10 @@ ssize_t writeBitBuffer
     return 0;
 }
 
+inline int emptyFile(struct BitwiseBufferedFile* bitFile){
+    return bitFile->emptyFile;
+}
+
 #if 0
 int main()
 {

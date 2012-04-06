@@ -20,6 +20,7 @@
  **/
 #include <sys/types.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "bufferConfiguration.h"
 
 /**
@@ -80,3 +81,5 @@ ssize_t writeBitBuffer
 (
     struct BitwiseBufferedFile* bitFile, CELL_TYPE data, size_t length
 );
+
+inline int emptyFile(struct BitwiseBufferedFile* bitFile);

@@ -49,18 +49,24 @@ int compress(FILE* inputFile, FILE* outputFile)
         closeBitwiseBufferedFile(w);
         return -1;
     }
+    /*TODO DECOMMENTARE!!! 
     if //OR short circuit exploited to write the interpreter directive
     (
-        //TODO fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) < sizeof(LZ78_INTERPRETER)
-        //||
+        fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) < sizeof(LZ78_INTERPRETER)
+        ||
         fflush(outputFile) == EOF
     ) goto exceptionHandler;
-    while(feof(inputFile) & !ferror(inputFile))
+    */
+    printf("COMPRESSORE ONLINE\n");
+    while(!feof(inputFile) && !ferror(inputFile))
     {
+	printf("LA PRINTF CHE NON PRInta\n");
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
+	    printf("Ho letto: %u\n",readByte[byteIndex]);
             child = hashLookup(hashTable, lookupIndex, &(readByte[byteIndex]));
+	    printf("Era nell'indice: %u\n", child);
             if(child != ROOT_INDEX) lookupIndex = child; //TODO giusto usare root_index?
             else
             {
@@ -105,10 +111,12 @@ int compress(FILE* inputFile, FILE* outputFile)
         ||
         writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1
     ) goto exceptionHandler;
+    printf("Compressore:SCRIVO IL FINE FILE\n");
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
     closeBitwiseBufferedFile(w);
+    printf("COMPRESSORE OFFLINE\n");
     return 0;
 
     /**

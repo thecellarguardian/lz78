@@ -119,8 +119,9 @@ INDEX_TYPE hashLookup
     uint8_t* childValue
 ) //TODO inline?
 {
+    printf("INIZIO LOOKUP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
-    INDEX_TYPE i = 0;
+    HASH_INDEX i = 0;
     while
     (
         (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)
@@ -128,14 +129,10 @@ INDEX_TYPE hashLookup
     {
         index = (index + 1)%(MAX_CHILD*2); //lento
         i++;
-        if(i == MAX_CHILD*2) break;
+	printf("Iterazione %4u\n",i);
+        if(i == MAX_CHILD*2) return ROOT_INDEX;
     }
-    return
-    (
-        table[index].childValue  == *childValue && //lento
-        table[index].fatherIndex == fatherIndex //lento
-    )?
-        table[index].childIndex : ROOT_INDEX; //lento
+    return table[index].childIndex; //lento
 }
 
 void hashDestroy(struct LZ78HashTableEntry* table){
