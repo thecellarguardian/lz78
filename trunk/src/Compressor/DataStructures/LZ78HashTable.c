@@ -36,12 +36,15 @@ struct LZ78HashTableEntry
 
 INDEX_TYPE hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
 {
-    printf("HASH");
     INDEX_TYPE index = 0;
     uint8_t* byteKey1 = (uint8_t*)(&key1);
     key1 ^= key2; //TODO migliorare
-    int i = sizeof(INDEX_TYPE);
-    for (; i-- ;) index ^= ( index << 5 ) + ( index >> 2 ) + ((INDEX_TYPE)*(&byteKey1)[i]);
+    int i = 0;
+    for (; i < sizeof(INDEX_TYPE) ; i++)
+    {
+        index ^= (index << 5) + (index >> 2) + ((INDEX_TYPE)(byteKey1[i]));
+    }
+    index %= MAX_CHILD*2;
     return index;
 }
 
@@ -57,13 +60,14 @@ int hashInsert
 {
     //è tutto molto lento, inoltre gli INDEX_TYPE sono un casino, non è proprio
     //bello che siano uguali ai CELL_TYPE
-    printf("father: %llu\nchildVal: %u, childIndex: %llu", fatherIndex, childValue, childIndex);
-    INDEX_TYPE index = hashFunction(fatherIndex, *childValue);
+    INDEX_TYPE index = hashFunction(fatherIndex, (INDEX_TYPE)(*childValue));
+
     INDEX_TYPE i = 0;
-    while(table[index].childIndex != ROOT_INDEX && i < MAX_CHILD*2) //lento
+    while(table[index].childIndex != ROOT_INDEX) //lento
     {
         index = (index + 1)%(MAX_CHILD*2); //lento
         i++;
+        if(i == MAX_CHILD*2) break;
     }
     if(table[index].childIndex != ROOT_INDEX) return -1;
     table[index].childIndex = childIndex; //lento
@@ -74,13 +78,14 @@ int hashInsert
 
 struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
 {
-    int i = HASH_TABLE_LENGTH;
+    int i = MAX_CHILD*2;
     uint8_t currentValue = 0;
     if(table != NULL)
     {
         for(; i-- ;) table[i].childIndex = ROOT_INDEX;
-        for(; currentValue--;) //i caratteri ascii coincidono con il loro indice
+        for(i = 0 ; i < 256; i++) //i caratteri ascii coincidono con il loro indice
         {
+            currentValue = (uint8_t)i;
             if
             (
                 hashInsert
@@ -88,7 +93,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
                     table,
                     ROOT_INDEX,
                     &currentValue,
-                    currentValue
+                    (INDEX_TYPE)currentValue
                 ) == -1
             ) goto exceptionHandler;
         }
@@ -102,7 +107,6 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
 
 inline struct LZ78HashTableEntry* hashCreate()
 {
-    printf("aaa");
     return hashInitialize((struct LZ78HashTableEntry*)malloc(HASH_TABLE_LENGTH));
 }
 
@@ -119,17 +123,16 @@ INDEX_TYPE hashLookup
 ) //TODO inline?
 {
     struct LZ78HashTableEntry* result;
-    INDEX_TYPE index = hashFunction(fatherIndex, *childValue);
+    INDEX_TYPE index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
     INDEX_TYPE i = 0;
     while
     (
-        table[index].childValue  != *childValue && //lento
-        table[index].fatherIndex != fatherIndex && //lento
-        i < MAX_CHILD*2
+        (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)
     )
     {
         index = (index + 1)%(MAX_CHILD*2); //lento
         i++;
+        if(i == MAX_CHILD*2) break;
     }
     return
     (

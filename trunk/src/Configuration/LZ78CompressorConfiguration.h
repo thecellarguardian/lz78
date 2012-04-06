@@ -27,5 +27,5 @@
 #define LOCAL_BYTE_BUFFER_LENGTH 8
 #define LZ78_INTERPRETER "#!/usr/bin/env lz78"
 //TODO CELL_TYPE dipende da MAX_CHILD + attenzione agli include
-#define INDEX_TYPE CELL_TYPE 
+#define INDEX_TYPE CELL_TYPE
 
