@@ -20,18 +20,8 @@
  **/
 
 #include "DecompressorTable.h"
-#include "../../../lib/BitwiseBufferedFile/bufferConfiguration.h"
-#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
-
-struct Node
-{
-    //CELL_TYPE father;
-    //uint8_t symbol;
-    uint8_t* word;
-    CELL_TYPE length; // worst case = tree levels
-};
 
 //TODO if table!= null ovunque??
 

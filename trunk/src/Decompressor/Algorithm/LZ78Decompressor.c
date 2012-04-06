@@ -22,6 +22,7 @@
 #include "LZ78Decompressor.h"
 #include "../../Configuration/LZ78CompressorConfiguration.h"
 #include "../DataStructures/DecompressorTable.h"
+#include "../../../lib/BitwiseBufferedFile/BitwiseBufferedFile.h"
 #include <stdint.h>
 #include <errno.h>
 #include <string.h>
@@ -37,15 +38,15 @@ int decompress(FILE* inputFile, FILE* outputFile)
     INDEX_TYPE currentIndex;
     INDEX_TYPE length = 0;
     uint8_t* result;
-    struct Node table[MAX_CHILD];
+    struct Node* table;
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
         if(r != NULL) closeBitwiseBufferedFile(r);
         return -1;
     }
-    tableInitialize(table);//TODO inizializzazione table, gestione errori!
-    while(r->emptyFile == 0)
+    table = tableCreate();//TODO inizializzazione table, gestione errori!
+    while(!emptyFile(r))
     {
         if(readBitBuffer(r, &currentIndex, indexLength) == -1) goto exceptionHandler;
         if(currentIndex == ROOT_INDEX) break;
@@ -68,9 +69,16 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if(notFirstOccurence)
         {
             //table[childIndex - 1].symbol = *result;
-            table[childIndex - 1].word[table[childIndex - 1].lenght - 1] = *result;
+            table[childIndex - 1].word[table[childIndex - 1].length - 1] = *result;
         }
         childIndex++;
+	if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
+	{
+	    //The length of the transmitted index is incremented
+	    indexLength++;
+	    //The next power of 2 mask is set
+	    indexLengthMask = (indexLengthMask << 1) | 1;
+	}
         if(childIndex == MAX_CHILD)
         {
             tableReset(table);

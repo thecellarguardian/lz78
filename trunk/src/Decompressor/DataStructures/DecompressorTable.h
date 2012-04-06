@@ -20,10 +20,18 @@
  **/
 
 #include "../../Configuration/LZ78CompressorConfiguration.h"
+#include "../../../lib/BitwiseBufferedFile/bufferConfiguration.h"
+#include <stdint.h>
 
-struct Node;
+struct Node
+{
+    //CELL_TYPE father;
+    //uint8_t symbol;
+    uint8_t* word;
+    CELL_TYPE length; // worst case = tree levels
+};
 
-int tableInitialize(struct Node* table);
+struct Node* tableCreate();
 
 void tableReset(struct Node* table);
 

@@ -51,8 +51,8 @@ int compress(FILE* inputFile, FILE* outputFile)
     }
     if //OR short circuit exploited to write the interpreter directive
     (
-        fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) < sizeof(LZ78_INTERPRETER)
-        ||
+        //TODO fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) < sizeof(LZ78_INTERPRETER)
+        //||
         fflush(outputFile) == EOF
     ) goto exceptionHandler;
     while(feof(inputFile) & !ferror(inputFile))
@@ -77,7 +77,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                     ) == -1
                 ) goto exceptionHandler;
                 childIndex++;
-                if(childIndex & indexLengthMask == 0) //A power of 2 is reached
+                if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
                     //The length of the transmitted index is incremented
                     indexLength++;

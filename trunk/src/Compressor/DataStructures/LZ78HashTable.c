@@ -119,7 +119,6 @@ INDEX_TYPE hashLookup
     uint8_t* childValue
 ) //TODO inline?
 {
-    struct LZ78HashTableEntry* result;
     HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
     INDEX_TYPE i = 0;
     while
