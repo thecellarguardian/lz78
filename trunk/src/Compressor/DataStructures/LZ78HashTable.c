@@ -34,16 +34,14 @@ struct LZ78HashTableEntry
     INDEX_TYPE childIndex;
 };
 
-INDEX_TYPE hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
+HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
 {
-    INDEX_TYPE index = 0;
-    uint8_t* byteKey1 = (uint8_t*)(&key1);
-    key1 ^= key2; //TODO migliorare
+    HASH_INDEX index = 0;
+    HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
+    uint8_t* keyArray = ((uint8_t*)&key);
     int i = 0;
-    for (; i < sizeof(INDEX_TYPE) ; i++)
-    {
-        index ^= (index << 5) + (index >> 2) + ((INDEX_TYPE)(byteKey1[i]));
-    }
+    for (; i < sizeof(HASH_INDEX) ; i++)
+        index ^= (index << 5) + (index >> 2) + ((INDEX_TYPE)(keyArray[i]));
     index %= MAX_CHILD*2;
     return index;
 }
@@ -60,8 +58,7 @@ int hashInsert
 {
     //è tutto molto lento, inoltre gli INDEX_TYPE sono un casino, non è proprio
     //bello che siano uguali ai CELL_TYPE
-    INDEX_TYPE index = hashFunction(fatherIndex, (INDEX_TYPE)(*childValue));
-
+    HASH_INDEX index = hashFunction(fatherIndex, (INDEX_TYPE)(*childValue));
     INDEX_TYPE i = 0;
     while(table[index].childIndex != ROOT_INDEX) //lento
     {
@@ -123,7 +120,7 @@ INDEX_TYPE hashLookup
 ) //TODO inline?
 {
     struct LZ78HashTableEntry* result;
-    INDEX_TYPE index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
+    HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
     INDEX_TYPE i = 0;
     while
     (

@@ -20,9 +20,10 @@
  **/
 
 #include <stdint.h>
+#include "../../Configuration/LZ78CompressorConfiguration.h"
 #include "../../../lib/BitwiseBufferedFile/bufferConfiguration.h"
 
-#define INDEX_TYPE CELL_TYPE
+#define HASH_INDEX uint32_t //il numero di bit che serve per indicizzare 2*MAX_CHILD
 #define HASH_TABLE_LENGTH MAX_CHILD * 2 * sizeof(struct LZ78HashTableEntry)
 
 struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry*);
