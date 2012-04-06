@@ -19,8 +19,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-int tableInitialize(Node* table);
+#include "../../Configuration/LZ78CompressorConfiguration.h"
 
-int tableReset(Node* table);
+struct Node;
 
-int tableDestroy(Node* table);
+int tableInitialize(struct Node* table);
+
+void tableReset(struct Node* table);
+
+void tableDestroy(struct Node* table);

@@ -19,7 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#include LZ78CompressorConfiguration.h
+#include "DecompressorTable.h"
+#include "../../../lib/BitwiseBufferedFile/bufferConfiguration.h"
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
 
 struct Node
 {
@@ -31,7 +35,7 @@ struct Node
 
 //TODO if table!= null ovunque??
 
-void tableDestroy(Node* table)
+void tableDestroy(struct Node* table)
 {
     int i = MAX_CHILD - 1;
     for(; i--;) free(table[i].word);
@@ -39,7 +43,7 @@ void tableDestroy(Node* table)
     free(table);
 }
 
-Node* tableCreate()
+struct Node* tableCreate()
 {
     struct Node* table = calloc(MAX_CHILD, sizeof(struct Node));
     int i = ROOT_INDEX;
@@ -63,7 +67,7 @@ Node* tableCreate()
     return table;
 }
 
-inline void tableReset(Node* table)
+inline void tableReset(struct Node* table)
 {
     tableDestroy(table + ROOT_INDEX + 1);
 }

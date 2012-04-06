@@ -21,8 +21,9 @@
 
 #include "LZ78Compressor.h"
 #include "../DataStructures/LZ78HashTable.h"
-#include "../Configuration/LZ78CompressorConfiguration.h"
+#include "../../Configuration/LZ78CompressorConfiguration.h"
 #include "../../../lib/BitwiseBufferedFile/BitwiseBufferedFile.h"
+#include <errno.h>
 
 int compress(FILE* inputFile, FILE* outputFile)
 {
@@ -31,18 +32,18 @@ int compress(FILE* inputFile, FILE* outputFile)
     size_t indexLength = INITIAL_INDEX_LENGTH;
     size_t bufferedBytes;
     int byteIndex = 0;
-    LZ78HashTable* hashTable;
-    CELL_TYPE childIndex = ROOT_INDEX + 1;
-    CELL_TYPE lookupIndex = ROOT_INDEX;
-    CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
-    CELL_TYPE child;
+    struct LZ78HashTableEntry* hashTable;
+    INDEX_TYPE childIndex = ROOT_INDEX + 1;
+    INDEX_TYPE lookupIndex = ROOT_INDEX;
+    INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
+    INDEX_TYPE child;
     if(inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
         if(w != NULL) closeBitwiseBufferedFile(w);
         return -1;
     }
-    hashTable = hashInitialize();
+    hashTable = hashCreate();
     if(hashTable == NULL)
     {
         closeBitwiseBufferedFile(w);
@@ -57,9 +58,9 @@ int compress(FILE* inputFile, FILE* outputFile)
     while(feof(inputFile) & !ferror(inputFile))
     {
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
-        for(byteIndex = 0; byteIndex < bufferedBytes; i++)
+        for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
-            child = hashLookup(hashTable, lookupIndex, readByte[byteIndex]);
+            child = hashLookup(hashTable, lookupIndex, &(readByte[byteIndex]));
             if(child != ROOT_INDEX) lookupIndex = child; //TODO giusto usare root_index?
             else
             {
@@ -71,7 +72,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                     (
                         hashTable,
                         lookupIndex,
-                        readByte[byteIndex],
+                        &readByte[byteIndex],
                         childIndex
                     ) == -1
                 ) goto exceptionHandler;

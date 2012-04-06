@@ -21,16 +21,21 @@
 
 #include "LZ78Decompressor.h"
 #include "../../Configuration/LZ78CompressorConfiguration.h"
+#include "../DataStructures/DecompressorTable.h"
+#include <stdint.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
 
-int decompress(FILE* inputFile, FILE* outputFile) //Attenzione: generalizzare a FILE*
+int decompress(FILE* inputFile, FILE* outputFile)
 {
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, 0, -1, inputFile);
-    CELL_TYPE indexLengthMask = INDEX_LENGTH_MASK;
+    INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     size_t indexLength = INITIAL_INDEX_LENGTH;
-    CELL_TYPE childIndex = ROOT_INDEX + 1;
+    INDEX_TYPE childIndex = ROOT_INDEX + 1;
     int notFirstOccurence = 0;
-    CELL_TYPE currentIndex;
-    CELL_TYPE length = 0;
+    INDEX_TYPE currentIndex;
+    INDEX_TYPE length = 0;
     uint8_t* result;
     struct Node table[MAX_CHILD];
     if(r == NULL || outputFile == NULL)
