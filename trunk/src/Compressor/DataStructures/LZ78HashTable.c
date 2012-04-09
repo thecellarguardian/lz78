@@ -119,7 +119,7 @@ INDEX_TYPE hashLookup
     uint8_t* childValue
 ) //TODO inline?
 {
-    printf("INIZIO LOOKUP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+   // printf("INIZIO LOOKUP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
     HASH_INDEX i = 0;
     while
@@ -129,7 +129,9 @@ INDEX_TYPE hashLookup
     {
         index = (index + 1)%(MAX_CHILD*2); //lento
         i++;
-	printf("Iterazione %4u\n",i);
+	//if(i==0)
+	  //  printf("PRIMA Iterazione \n");
+	//printf("Iterazione %4u\n",i);
         if(i == MAX_CHILD*2) return ROOT_INDEX;
     }
     return table[index].childIndex; //lento
