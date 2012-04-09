@@ -60,16 +60,21 @@ int compress(FILE* inputFile, FILE* outputFile)
     printf("COMPRESSORE ONLINE\n");
     while(!feof(inputFile) && !ferror(inputFile))
     {
-	printf("LA PRINTF CHE NON PRInta\n");
+	//printf("LA PRINTF CHE NON PRInta\n");
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
+	//printf("Ho letto: %s\n",(char*)&readByte);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
-	    printf("Ho letto: %u\n",readByte[byteIndex]);
+	    printf("Cerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
             child = hashLookup(hashTable, lookupIndex, &(readByte[byteIndex]));
-	    printf("Era nell'indice: %u\n", child);
-            if(child != ROOT_INDEX) lookupIndex = child; //TODO giusto usare root_index?
+	    //printf("Era nell'indice: %u\n", child);
+            if(child != ROOT_INDEX){
+		lookupIndex = child; //TODO giusto usare root_index?
+		printf("Trovato qui: %i\n",lookupIndex);
+	    }
             else
             {
+		printf("Non l'ho trovato allora ");
                 if //OR short circuit evaluation exploited
                 (
                     writeBitBuffer(w, lookupIndex, indexLength) == -1
@@ -82,6 +87,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                         childIndex
                     ) == -1
                 ) goto exceptionHandler;
+		printf("ho scritto: %u\n", lookupIndex);
                 childIndex++;
                 if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
@@ -91,7 +97,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                     indexLengthMask = (indexLengthMask << 1) | 1;
                 }
                 //readByte value is also the right index to start with next time
-                lookupIndex = readByte[byteIndex];
+                lookupIndex = ROOT_INDEX;//readByte[byteIndex]; MA SCHERZIAMO??
                 if (childIndex == MAX_CHILD)
                 {
                     hashReset(hashTable); //TODO controllare errore

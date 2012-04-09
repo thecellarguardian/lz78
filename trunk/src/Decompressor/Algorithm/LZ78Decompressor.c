@@ -46,20 +46,21 @@ int decompress(FILE* inputFile, FILE* outputFile)
         return -1;
     }
     table = tableCreate();//TODO inizializzazione table, gestione errori!
-    printf("INIZIO DECOMPRESSIONE");
+    printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
-	printf("leggo");
+	printf("leggo\n");
         if(readBitBuffer(r, &currentIndex, indexLength) == -1){
-	    printf("non riesce a leggere");
+	    printf("non riesce a leggere\n\n");
 	    goto exceptionHandler;
 	}
         if(currentIndex == ROOT_INDEX) break;
         result = table[currentIndex].word;
+	printf("ho letto: %s\n",result);
         length = table[currentIndex].length;
         if(fwrite(result, 1, length, outputFile) != length)
         {
-	    printf("errore in scrittura");
+	    printf("errore in scrittura\n\n");
             errno = EBADFD;
             goto exceptionHandler;
         }
@@ -67,7 +68,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         table[childIndex].length = length + 1;
         table[childIndex].word = malloc(length + 1);
         if(table[childIndex].word == NULL){
-	    printf("fallisce la malloc");
+	    printf("fallisce la malloc\n\n");
 	    goto exceptionHandler;
 	}
         bcopy(result,table[childIndex].word,length); //DEPRECATED
@@ -94,7 +95,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             childIndex = ROOT_INDEX + 1;
         }
     }
-    printf("FINE DECOMPRESSIONE");
+    printf("FINE DECOMPRESSIONE\n");
     return 0;
 
     exceptionHandler:
