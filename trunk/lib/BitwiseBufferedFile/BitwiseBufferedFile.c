@@ -48,6 +48,7 @@ struct BitwiseBufferedFile* openBitwiseBufferedFile
     FILE* fileToSet
 )
 {
+    printf("OPEN: %i\n", CELL_TYPE_LENGTH);
     int fileDescriptor = -1;
     struct BitwiseBufferedFile* bitFile = NULL;
     if(mode != O_RDONLY && mode != O_WRONLY)
