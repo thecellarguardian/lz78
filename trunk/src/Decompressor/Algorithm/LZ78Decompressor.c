@@ -53,10 +53,9 @@ int decompress(FILE* inputFile, FILE* outputFile)
 	    printf("non riesce a leggere\n\n");
 	    goto exceptionHandler;
 	}
-	printf("ho letto %i\n",currentIndex);
+	printf("\nho letto %i\n",currentIndex);
         if(currentIndex == ROOT_INDEX) break;
         result = table[currentIndex].word;
-	printf("ho recuperato %s\n",result);
         length = table[currentIndex].length;
         if(fwrite(result, 1, length, outputFile) != length)
         {
@@ -82,7 +81,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         {
             //table[childIndex - 1].symbol = *result;
             table[childIndex - 1].word[table[childIndex - 1].length - 1] = *result;
-	    printf("aggiorno con %s l'indice %i\n",result,childIndex);
+	    printf("aggiorno con %s il figlio %i\n",result,childIndex-1);
         }
         childIndex++;
 	if((childIndex & indexLengthMask) == 0) //A power of 2 is reached

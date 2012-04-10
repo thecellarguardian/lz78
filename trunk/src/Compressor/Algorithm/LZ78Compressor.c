@@ -65,7 +65,7 @@ int compress(FILE* inputFile, FILE* outputFile)
         //printf("Ho letto: %s\n",(char*)&readByte);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
-            printf("Cerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
+            printf("\nCerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
             child = hashLookup(hashTable, lookupIndex, &(readByte[byteIndex]));
             //printf("Era nell'indice: %u\n", child);
             if(child != ROOT_INDEX)
@@ -89,7 +89,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                     ) == -1
                 ) goto exceptionHandler;
                 printf("ho scritto: %i\n", lookupIndex);
-		printf("Ho inserito il figlio: %i\n", childIndex);
+		printf("Ho inserito %s nel figlio: %i\n",&readByte[byteIndex], childIndex);
                 childIndex++;
                 if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
