@@ -65,7 +65,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         }
         printf("ho scritto %s\n",result);
         //table[childIndex].father = currentIndex;
-        table[childIndex].length = length + 1;
+        table[childIndex].length = length;
         table[childIndex].word = malloc(length + 1);
         if(table[childIndex].word == NULL){
 	    printf("fallisce la malloc\n\n");
@@ -80,6 +80,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if(childIndex > 257)
         {
             //table[childIndex - 1].symbol = *result;
+	    table[childIndex - 1].length ++;
             table[childIndex - 1].word[table[childIndex - 1].length - 1] = *result;
 	    printf("aggiorno con %s il figlio %i\n",result,childIndex-1);
         }
