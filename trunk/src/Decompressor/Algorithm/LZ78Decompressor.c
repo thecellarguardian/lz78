@@ -63,11 +63,11 @@ int decompress(FILE* inputFile, FILE* outputFile)
         {
             //table[childIndex - 1].symbol = *result;
 	    table[childIndex - 1].length ++;
-            table[childIndex - 1].word[table[childIndex - 1].length - 1] = *result;
-	    printf("aggiorno con %s il figlio %i\n",result,childIndex-1);
+            table[childIndex - 1].word[table[childIndex - 1].length - 1] = table[currentIndex].word[0];
+	    printf("aggiorno con %u il figlio %i\n",table[currentIndex].word[0],childIndex-1);
         }
         result = table[currentIndex].word;
-        length = table[currentIndex].length;	
+        length = table[currentIndex].length;
         if(fwrite(result, 1, length, outputFile) != length)
         {
 	    printf("errore in scrittura\n\n");
@@ -84,7 +84,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
 	}
         bcopy(result,table[childIndex].word,length); //DEPRECATED
 	printf("ho creato il figlio %i\n",childIndex);
-	//stava quì
+        //stava quì
         childIndex++;
 	if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
 	{
