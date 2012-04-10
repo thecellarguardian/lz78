@@ -177,7 +177,7 @@ int closeBitwiseBufferedFile(struct BitwiseBufferedFile* bitFile)
         (
             bitFile->fileDescriptor,
             bitFile->buffer,
-            index*sizeof(CELL_TYPE) + (offset >> 3)
+            index*sizeof(CELL_TYPE) + (offset >> 3) + (offset ? 1 : 0) //se è dentro il primo byte deve comunque dare 1
         );
     }
     error = close(bitFile->fileDescriptor);
@@ -256,6 +256,7 @@ ssize_t readBitBuffer
         bitFile->position += bitsToBeRead;
         readBits += bitsToBeRead;
     }
+    printf("Dal buffer è stato letto: %i\n\n",*data);
     return readBits;
 }
 
@@ -264,6 +265,7 @@ ssize_t writeBitBuffer
     struct BitwiseBufferedFile* bitFile, CELL_TYPE data, size_t length
 )
 {
+    printf("Nel buffer è stato scritto: %i\n\n",data);
     int index;
     int offset;
     int bitsToBeWritten;
@@ -289,7 +291,7 @@ ssize_t writeBitBuffer
             FULL_MASK : ((((CELL_TYPE)1) << bitsToBeWritten) - 1);
         bitFile->buffer[index] &= (((CELL_TYPE)1) << offset) - 1;
         bitFile->buffer[index] |= (data & mask) << offset;
-        length -= bitsToBeWritten;
+	length -= bitsToBeWritten;
         bitFile->position += bitsToBeWritten;
         bitFile->availableBits += bitsToBeWritten;
         if(bitFile->position >= BUFFER_CELLS*CELL_TYPE_LENGTH)

@@ -55,8 +55,19 @@ int decompress(FILE* inputFile, FILE* outputFile)
 	}
 	printf("\nho letto %i\n",currentIndex);
         if(currentIndex == ROOT_INDEX) break;
+         /**
+         * The previous child has to be updated with the current leading byte,
+         * but not the first time (in that case, no previous child exists).
+         **/
+        if(childIndex > 257)
+        {
+            //table[childIndex - 1].symbol = *result;
+	    table[childIndex - 1].length ++;
+            table[childIndex - 1].word[table[childIndex - 1].length - 1] = *result;
+	    printf("aggiorno con %s il figlio %i\n",result,childIndex-1);
+        }
         result = table[currentIndex].word;
-        length = table[currentIndex].length;
+        length = table[currentIndex].length;	
         if(fwrite(result, 1, length, outputFile) != length)
         {
 	    printf("errore in scrittura\n\n");
@@ -73,17 +84,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
 	}
         bcopy(result,table[childIndex].word,length); //DEPRECATED
 	printf("ho creato il figlio %i\n",childIndex);
-        /**
-         * The previous child has to be updated with the current leading byte,
-         * but not the first time (in that case, no previous child exists).
-         **/
-        if(childIndex > 257)
-        {
-            //table[childIndex - 1].symbol = *result;
-	    table[childIndex - 1].length ++;
-            table[childIndex - 1].word[table[childIndex - 1].length - 1] = *result;
-	    printf("aggiorno con %s il figlio %i\n",result,childIndex-1);
-        }
+	//stava quì
         childIndex++;
 	if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
 	{
