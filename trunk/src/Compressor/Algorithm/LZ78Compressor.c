@@ -62,7 +62,7 @@ int compress(FILE* inputFile, FILE* outputFile)
     {
         //printf("LA PRINTF CHE NON PRInta\n");
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
-        printf("Ho letto: %s\n",(char*)&readByte);
+        //printf("Ho letto: %s\n",(char*)&readByte);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
             printf("Cerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
@@ -88,7 +88,8 @@ int compress(FILE* inputFile, FILE* outputFile)
                         childIndex
                     ) == -1
                 ) goto exceptionHandler;
-                printf("ho scritto: %u\n", lookupIndex);
+                printf("ho scritto: %i\n", lookupIndex);
+		printf("Ho inserito il figlio: %i\n", childIndex);
                 childIndex++;
                 if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
@@ -118,6 +119,7 @@ int compress(FILE* inputFile, FILE* outputFile)
         ||
         writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1
     ) goto exceptionHandler;
+    printf("ho scritto: %i\n", lookupIndex);
     printf("Compressore:SCRIVO IL FINE FILE\n");
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);

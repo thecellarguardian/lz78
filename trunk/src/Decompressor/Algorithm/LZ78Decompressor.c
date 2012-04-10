@@ -64,6 +64,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             errno = EBADFD;
             goto exceptionHandler;
         }
+        printf("ho scritto %s\n",result);
         //table[childIndex].father = currentIndex;
         table[childIndex].length = length + 1;
         table[childIndex].word = malloc(length + 1);
@@ -72,7 +73,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
 	    goto exceptionHandler;
 	}
         bcopy(result,table[childIndex].word,length); //DEPRECATED
-	printf("ho inserito %s nell'indice %i\n",result,childIndex);
+	printf("ho creato il figlio %i\n",childIndex);
         /**
          * The previous child has to be updated with the current leading byte,
          * but not the first time (in that case, no previous child exists).
