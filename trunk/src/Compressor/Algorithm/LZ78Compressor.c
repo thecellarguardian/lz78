@@ -49,7 +49,7 @@ int compress(FILE* inputFile, FILE* outputFile)
         closeBitwiseBufferedFile(w);
         return -1;
     }
-    /*TODO DECOMMENTARE!!! 
+    /*TODO DECOMMENTARE!!!
     if //OR short circuit exploited to write the interpreter directive
     (
         fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) < sizeof(LZ78_INTERPRETER)
@@ -60,21 +60,22 @@ int compress(FILE* inputFile, FILE* outputFile)
     printf("COMPRESSORE ONLINE\n");
     while(!feof(inputFile) && !ferror(inputFile))
     {
-	//printf("LA PRINTF CHE NON PRInta\n");
+        //printf("LA PRINTF CHE NON PRInta\n");
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
-	//printf("Ho letto: %s\n",(char*)&readByte);
+        //printf("Ho letto: %s\n",(char*)&readByte);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
-	    printf("Cerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
+            printf("Cerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
             child = hashLookup(hashTable, lookupIndex, &(readByte[byteIndex]));
-	    //printf("Era nell'indice: %u\n", child);
-            if(child != ROOT_INDEX){
-		lookupIndex = child; //TODO giusto usare root_index?
-		printf("Trovato qui: %i\n",lookupIndex);
-	    }
+            //printf("Era nell'indice: %u\n", child);
+            if(child != ROOT_INDEX)
+            {
+                lookupIndex = child; //TODO giusto usare root_index?
+                printf("Trovato qui: %i\n",lookupIndex);
+            }
             else
             {
-		printf("Non l'ho trovato allora ");
+                printf("Non l'ho trovato allora ");
                 if //OR short circuit evaluation exploited
                 (
                     writeBitBuffer(w, lookupIndex, indexLength) == -1
@@ -87,7 +88,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                         childIndex
                     ) == -1
                 ) goto exceptionHandler;
-		printf("ho scritto: %u\n", lookupIndex);
+                printf("ho scritto: %u\n", lookupIndex);
                 childIndex++;
                 if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
@@ -121,9 +122,8 @@ int compress(FILE* inputFile, FILE* outputFile)
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/
-    closeBitwiseBufferedFile(w);
     printf("COMPRESSORE OFFLINE\n");
-    return 0;
+    return closeBitwiseBufferedFile(w);
 
     /**
      * "With great power there must also come great responsibility!"
