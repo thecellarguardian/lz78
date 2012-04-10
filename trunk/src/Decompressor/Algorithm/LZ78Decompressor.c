@@ -49,8 +49,8 @@ int decompress(FILE* inputFile, FILE* outputFile)
     printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
-        if(readBitBuffer(r, &currentIndex, indexLength) == -1){
-	    printf("non riesce a leggere\n\n");
+        if(readBitBuffer(r, &currentIndex, indexLength) < indexLength){ //era == -1
+	    printf("ATTENZIONE: non sono riescito a leggere %lu bit dal buffer\n\n",indexLength);
 	    goto exceptionHandler;
 	}
 	printf("\nho letto %i\n",currentIndex);
