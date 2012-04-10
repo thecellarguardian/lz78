@@ -99,7 +99,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                     indexLengthMask = (indexLengthMask << 1) | 1;
                 }
                 //readByte value is also the right index to start with next time
-                lookupIndex = ROOT_INDEX;//readByte[byteIndex]; MA SCHERZIAMO??
+                lookupIndex = readByte[byteIndex]; //ROOT_INDEX; MA SCHERZIAMO??
                 if (childIndex == MAX_CHILD)
                 {
                     hashReset(hashTable); //TODO controllare errore
@@ -115,12 +115,12 @@ int compress(FILE* inputFile, FILE* outputFile)
     }
     if
     (
-        writeBitBuffer(w, lookupIndex, indexLength) == -1
+        writeBitBuffer(w, childIndex-1, indexLength) == -1
         ||
         writeBitBuffer(w, ROOT_INDEX, INITIAL_INDEX_LENGTH) == -1
     ) goto exceptionHandler;
-    printf("ho scritto: %i\n", lookupIndex);
-    printf("Compressore:SCRIVO IL FINE FILE\n");
+    printf("ho scritto: %i\n", childIndex-1);
+    printf("ho scritto: %i\n", ROOT_INDEX);
     /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
        writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
     }*/

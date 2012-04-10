@@ -34,7 +34,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     size_t indexLength = INITIAL_INDEX_LENGTH;
     INDEX_TYPE childIndex = ROOT_INDEX + 1;
-    int notFirstOccurence = 0;
+    //int notFirstOccurence = 0;
     INDEX_TYPE currentIndex;
     INDEX_TYPE length = 0;
     uint8_t* result;
@@ -78,7 +78,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
          * The previous child has to be updated with the current leading byte,
          * but not the first time (in that case, no previous child exists).
          **/
-        if(notFirstOccurence)
+        if(childIndex > 257)
         {
             //table[childIndex - 1].symbol = *result;
             table[childIndex - 1].word[table[childIndex - 1].length - 1] = *result;
