@@ -99,6 +99,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
 	    printf("reset della tabella\n");
         }
     }
+    printf("\nho letto FINE FILE\n");
     printf("FINE DECOMPRESSIONE\n");
     return 0;
 
