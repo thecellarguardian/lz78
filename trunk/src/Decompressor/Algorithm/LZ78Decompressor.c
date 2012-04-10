@@ -49,14 +49,14 @@ int decompress(FILE* inputFile, FILE* outputFile)
     printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
-	printf("leggo\n");
         if(readBitBuffer(r, &currentIndex, indexLength) == -1){
 	    printf("non riesce a leggere\n\n");
 	    goto exceptionHandler;
 	}
+	printf("ho letto %i\n",currentIndex);
         if(currentIndex == ROOT_INDEX) break;
         result = table[currentIndex].word;
-	printf("ho letto: %s\n",result);
+	printf("ho recuperato %s\n",result);
         length = table[currentIndex].length;
         if(fwrite(result, 1, length, outputFile) != length)
         {
@@ -72,6 +72,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
 	    goto exceptionHandler;
 	}
         bcopy(result,table[childIndex].word,length); //DEPRECATED
+	printf("ho inserito %s nell'indice %i\n",result,childIndex);
         /**
          * The previous child has to be updated with the current leading byte,
          * but not the first time (in that case, no previous child exists).
@@ -80,6 +81,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         {
             //table[childIndex - 1].symbol = *result;
             table[childIndex - 1].word[table[childIndex - 1].length - 1] = *result;
+	    printf("aggiorno con %s l'indice %i\n",result,childIndex);
         }
         childIndex++;
 	if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
@@ -88,11 +90,13 @@ int decompress(FILE* inputFile, FILE* outputFile)
 	    indexLength++;
 	    //The next power of 2 mask is set
 	    indexLengthMask = (indexLengthMask << 1) | 1;
+	    printf("aumento la lunghezza dell'indice \n");
 	}
         if(childIndex == MAX_CHILD)
         {
             tableReset(table);
             childIndex = ROOT_INDEX + 1;
+	    printf("reset della tabella\n");
         }
     }
     printf("FINE DECOMPRESSIONE\n");

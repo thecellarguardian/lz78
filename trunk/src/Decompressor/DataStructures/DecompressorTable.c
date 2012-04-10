@@ -22,6 +22,7 @@
 #include "DecompressorTable.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 //TODO if table!= null ovunque??
 
@@ -51,6 +52,7 @@ struct Node* tableCreate()
                 break;
             }
             table[i].word[0] = i;
+	    printf("riempio la posizione %i con %s\n",i,table[i].word);
             //table[i].father = ROOT_INDEX;
         }
     }

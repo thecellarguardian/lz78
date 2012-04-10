@@ -62,7 +62,7 @@ int compress(FILE* inputFile, FILE* outputFile)
     {
         //printf("LA PRINTF CHE NON PRInta\n");
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
-        //printf("Ho letto: %s\n",(char*)&readByte);
+        printf("Ho letto: %s\n",(char*)&readByte);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
             printf("Cerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
