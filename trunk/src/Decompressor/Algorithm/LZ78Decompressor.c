@@ -53,7 +53,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
 	struct Node* current;
         if(readBitBuffer(r, &currentIndex, indexLength) < indexLength)
         {
-            printf("ATTENZIONE: non sono riescito a leggere %u bit dal buffer\n\n",indexLength);
+            //printf("ATTENZIONE: non sono riescito a leggere %u bit dal buffer\n\n",indexLength);
             goto exceptionHandler;
         }
         printf("\nho letto %i\n",currentIndex);
