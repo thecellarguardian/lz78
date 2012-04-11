@@ -25,8 +25,6 @@
 
 struct Node
 {
-    //CELL_TYPE father;
-    //uint8_t symbol;
     uint8_t* word;
     CELL_TYPE length; // worst case = tree levels
 };
