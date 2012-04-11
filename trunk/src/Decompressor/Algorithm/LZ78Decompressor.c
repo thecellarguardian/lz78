@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 int decompress(FILE* inputFile, FILE* outputFile)
 {
@@ -49,11 +50,13 @@ int decompress(FILE* inputFile, FILE* outputFile)
     printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
-        if(readBitBuffer(r, &currentIndex, indexLength) < indexLength){ //era == -1
-//        printf("ATTENZIONE: non sono riescito a leggere %u bit dal buffer\n\n",indexLength);
-        goto exceptionHandler;
-    }
-    printf("\nho letto %i\n",currentIndex);
+        if(readBitBuffer(r, &currentIndex, indexLength) < indexLength)
+        {
+            //era == -1
+            //        printf("ATTENZIONE: non sono riescito a leggere %u bit dal buffer\n\n",indexLength);
+            goto exceptionHandler;
+        }
+        printf("\nho letto %i\n",currentIndex);
         if(currentIndex == ROOT_INDEX) break;
          /**
          * The previous child has to be updated with the current leading byte,
@@ -62,43 +65,52 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if(childIndex > 257)
         {
             //table[childIndex - 1].symbol = *result;
-        table[childIndex - 1].length ++;
-            table[childIndex - 1].word[table[childIndex - 1].length - 1] = table[currentIndex].word[0];
-        printf("aggiorno con %u il figlio %i\n",table[currentIndex].word[0],childIndex-1);
+            assert(childIndex - 1 < MAX_CHILD && childIndex - 1 >= 0);
+                table[childIndex - 1].length++;
+            assert(currentIndex < MAX_CHILD && currentIndex >= 0);
+                CELL_TYPE LENGTH = table[childIndex - 1].length - 1;
+                printf("currentIndex: %u", currentIndex);
+                uint8_t val = table[currentIndex].word[0];
+                table[childIndex - 1].word[LENGTH] = val;
+            printf("aggiorno con %u il figlio %i\n",table[currentIndex].word[0],childIndex-1);
         }
+        assert(currentIndex < MAX_CHILD && currentIndex >= 0);
         result = table[currentIndex].word;
         length = table[currentIndex].length;
         if(fwrite(result, 1, length, outputFile) != length)
         {
-        printf("errore in scrittura\n\n");
+            printf("errore in scrittura\n\n");
             errno = EBADFD;
             goto exceptionHandler;
         }
         printf("ho scritto %s\n",result);
         //table[childIndex].father = currentIndex;
+        assert(childIndex < MAX_CHILD && childIndex >= 0);
         table[childIndex].length = length;
         table[childIndex].word = malloc(length + 1);
-        if(table[childIndex].word == NULL){
-        printf("fallisce la malloc\n\n");
-        goto exceptionHandler;
-    }
-        bcopy(result,table[childIndex].word,length); //DEPRECATED
-    printf("ho creato il figlio %i\n",childIndex);
+        if(table[childIndex].word == NULL)
+        {
+            printf("fallisce la malloc\n\n");
+            goto exceptionHandler;
+        }
+        assert(childIndex < MAX_CHILD && childIndex >= 0);
+        bcopy(result,table[childIndex].word, length); //DEPRECATED
+        printf("ho creato il figlio %i\n",childIndex);
         //stava quì
         childIndex++;
-    if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
-    {
-        //The length of the transmitted index is incremented
-        indexLength++;
-        //The next power of 2 mask is set
-        indexLengthMask = (indexLengthMask << 1) | 1;
-        printf("aumento la lunghezza dell'indice \n");
-    }
+        if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
+        {
+            //The length of the transmitted index is incremented
+            indexLength++;
+            //The next power of 2 mask is set
+            indexLengthMask = (indexLengthMask << 1) | 1;
+            printf("aumento la lunghezza dell'indice \n");
+        }
         if(childIndex == MAX_CHILD)
         {
             tableReset(table);
             childIndex = ROOT_INDEX + 1;
-        printf("reset della tabella\n");
+            printf("reset della tabella\n");
         }
     }
     printf("\nho letto FINE FILE\n");

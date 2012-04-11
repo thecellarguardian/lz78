@@ -58,7 +58,7 @@
 #elif CELL_TYPE_LENGTH == 32
     #define CELL_TYPE uint32_t
     #define CELL_TYPE_BYTE_LENGTH 4
-    #define SHIFT_FACTOR 3
+    #define SHIFT_FACTOR 2
     #define BITWISE_SHIFT_FACTOR 5
     #define FULL_MASK 0xFFFFFFFF
     #define MODULO_MASK 2
