@@ -55,6 +55,7 @@ int hashInsert
 )
 {
     if(table == NULL) return -1;
+    struct LZ78HashTableEntry* current;
     HASH_INDEX index = hashFunction(fatherIndex, (INDEX_TYPE)(*childValue));
     //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
     while(table[index].childIndex != ROOT_INDEX) //collision, find first empty. Slow but it's done only in case of collision
@@ -63,10 +64,10 @@ int hashInsert
         //i++; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
         //if(i == MAX_CHILD*2) break; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
     }
-    //if(table[index].childIndex != ROOT_INDEX) return -1; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
-    table[index].childIndex = childIndex; //TODO lento
-    table[index].fatherIndex = fatherIndex; //TODO lento
-    table[index].childValue = *childValue; //TODO lento
+    //if(table[index].childIndex != ROOT_INDEX) return -1; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
+    current.childIndex = childIndex;
+    current.fatherIndex = fatherIndex;
+    current.childValue = *childValue;
     
     return 0;
 }
@@ -100,7 +101,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
     if(table != NULL)
     {
         for(; i-- ;) table[i].childIndex = ROOT_INDEX; //TODO due for!!! mannaggia la miseria
-        for(i = 0 ; i < 256; i++) //TODO parametrico?
+        for(i = 0 ; i < ROOT_INDEX; i++)
         {
             currentValue = (uint8_t)i;  //ascii value equals to index value
             if
