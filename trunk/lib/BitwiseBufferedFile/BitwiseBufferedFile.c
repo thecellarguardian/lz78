@@ -138,12 +138,15 @@ ssize_t loadBitBuffer(int fileDescriptor, CELL_TYPE* buffer, size_t count)
     }
     readBytes = n;
     #if CELL_TYPE_LENGTH != 8
-        if((n & ((ssize_t)(MODULO_MASK))) != 0) //if(n % sizeof(CELL_TYPE) != 0)
+        int offset = (n & ((ssize_t)(MODULO_MASK)));
+        n >>= SHIFT_FACTOR;// n = n/(sizeof(CELL_TYPE));
+        if(offset != 0) //if(n % sizeof(CELL_TYPE) != 0)
         {
             /*TODO gestire il caso in cui vengano letti un numero di byte non
             congruente con la dimensione della cella*/
+            n++;
+            buffer[n] &= ((((CELL_TYPE)1) << offset*8) - 1);
         }
-        n >>= SHIFT_FACTOR; // n = n/(sizeof(CELL_TYPE));
     #endif
     // n refers to the number of read cells
     #if CELL_TYPE_LENGTH != 8
@@ -227,6 +230,7 @@ ssize_t readBitBuffer
                 (
                     bitFile->fileDescriptor, bitFile->buffer, BUFFER_BYTES
                 );
+            printf("CARICO IL BITBUFFER");
             if(err == -1) return -1;
             if(err == 0)
             {

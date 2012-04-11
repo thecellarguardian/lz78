@@ -61,7 +61,7 @@
     #define SHIFT_FACTOR 2
     #define BITWISE_SHIFT_FACTOR 5
     #define FULL_MASK 0xFFFFFFFF
-    #define MODULO_MASK 2
+    #define MODULO_MASK 3
     #define BITWISE_MODULO_MASK 31
     #define LITTLE_ENDIAN_TO_HOST_CONVERT le32toh
     #define HOST_TO_LITTLE_ENDIAN_CONVERT htole32
