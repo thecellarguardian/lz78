@@ -37,22 +37,22 @@ struct Node* tableCreate()
 {
     struct Node* table = calloc(MAX_CHILD, sizeof(struct Node));
     int i = ROOT_INDEX;
+    struct Node* current;
     if(table != NULL)
     {
         for(; i--;)
         {
-            //table[i].symbol = i;
-            table[i].length = 1;
-            table[i].word = malloc(1);
-            if(table[i].word == NULL)
+            current = table[i];
+	    current.length = 1;
+            current.word = malloc(1);
+            if(current.word == NULL)
             {
                 tableDestroy(table);
                 table = NULL;
                 break;
             }
-            table[i].word[0] = i;
-            printf("riempio la posizione %i con %c\n", i, table[i].word[0]);
-            //table[i].father = ROOT_INDEX;
+            current.word[0] = i;
+            printf("riempio la posizione %i con %c\n", i, current.word[0]);
         }
     }
     return table;
