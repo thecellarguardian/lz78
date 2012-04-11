@@ -60,9 +60,7 @@ int compress(FILE* inputFile, FILE* outputFile)
     printf("COMPRESSORE ONLINE\n");
     while(!feof(inputFile) && !ferror(inputFile))
     {
-        //printf("LA PRINTF CHE NON PRInta\n");
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
-        //printf("Ho letto: %s\n",(char*)&readByte);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
             printf("\nCerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
