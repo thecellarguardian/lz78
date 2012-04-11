@@ -23,6 +23,7 @@
 #include "../../Configuration/LZ78CompressorConfiguration.h"
 #include "../DataStructures/DecompressorTable.h"
 #include "../../../lib/BitwiseBufferedFile/BitwiseBufferedFile.h"
+#include <fcntl.h>
 #include <stdint.h>
 #include <errno.h>
 #include <string.h>
@@ -30,11 +31,11 @@
 
 int decompress(FILE* inputFile, FILE* outputFile)
 {
-    struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, 0, -1, inputFile);
+    struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, O_RDONLY, -1, inputFile);
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     size_t indexLength = INITIAL_INDEX_LENGTH;
     INDEX_TYPE childIndex = ROOT_INDEX + 1;
-    INDEX_TYPE currentIndex;
+    INDEX_TYPE currentIndex = 0;
     INDEX_TYPE length = 0;
     uint8_t* result;
     struct Node* table;
@@ -50,7 +51,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
-    struct Node* current;
+        struct Node* current;
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
         {
             //printf("sono stati letti meno di %i bit", indexLength);
@@ -67,7 +68,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         {
         struct Node* lastChild = &(table[childIndex - 1]);
             lastChild->word[lastChild->length] = current->word[0];
-	    lastChild->length++;
+        lastChild->length++;
             printf("aggiorno con %u il figlio %i\n",current->word[0],childIndex-1);
         }
         result = current->word;
@@ -79,7 +80,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             goto exceptionHandler;
         }
         printf("ho scritto %s\n",result);
-	current = &(table[childIndex]);
+    current = &(table[childIndex]);
         current->length = length;
         current->word = malloc(length + 1);
         if(current->word == NULL)
