@@ -24,10 +24,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//TODO if table!= null ovunque??
-
 void tableDestroy(struct Node* table)
 {
+    if(table == NULL) return;
     int i = MAX_CHILD - 1;
     for(; i--;) free(table[i].word);
     bzero(table, sizeof(struct Node) * MAX_CHILD);
