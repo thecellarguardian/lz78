@@ -38,7 +38,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
     INDEX_TYPE length = 0;
     uint8_t* result;
     struct Node* table;
-    printf("\n\nsizeof(ssize_t): %i, sizeof(size_t): %i\n\n", sizeof(ssize_t), sizeof(size_t));
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
@@ -54,7 +53,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     struct Node* current;
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
         {
-            printf("sono stati letti meno di %i bit", indexLength);
+            //printf("sono stati letti meno di %i bit", indexLength);
             goto exceptionHandler;
         }
         printf("\nho letto %u\n", currentIndex);
@@ -68,7 +67,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         {
         struct Node* lastChild = &(table[childIndex - 1]);
             lastChild->word[lastChild->length] = current->word[0];
-        lastChild->length++;
+	    lastChild->length++;
             printf("aggiorno con %u il figlio %i\n",current->word[0],childIndex-1);
         }
         result = current->word;
@@ -80,7 +79,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             goto exceptionHandler;
         }
         printf("ho scritto %s\n",result);
-    current = &(table[childIndex]);
+	current = &(table[childIndex]);
         current->length = length;
         current->word = malloc(length + 1);
         if(current->word == NULL)
