@@ -27,7 +27,6 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
 
 int decompress(FILE* inputFile, FILE* outputFile)
 {
@@ -35,7 +34,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     size_t indexLength = INITIAL_INDEX_LENGTH;
     INDEX_TYPE childIndex = ROOT_INDEX + 1;
-    //int notFirstOccurence = 0;
     INDEX_TYPE currentIndex;
     INDEX_TYPE length = 0;
     uint8_t* result;
@@ -46,37 +44,34 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if(r != NULL) closeBitwiseBufferedFile(r);
         return -1;
     }
-    table = tableCreate();//TODO inizializzazione table, gestione errori!
+    table = tableCreate();
+    if(table == NULL)
+	return -1;
     printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
+	struct Node* current;
         if(readBitBuffer(r, &currentIndex, indexLength) < indexLength)
         {
-            //era == -1
-            //        printf("ATTENZIONE: non sono riescito a leggere %u bit dal buffer\n\n",indexLength);
+            printf("ATTENZIONE: non sono riescito a leggere %u bit dal buffer\n\n",indexLength);
             goto exceptionHandler;
         }
         printf("\nho letto %i\n",currentIndex);
         if(currentIndex == ROOT_INDEX) break;
+        current = &(table[currentIndex]);
          /**
          * The previous child has to be updated with the current leading byte,
          * but not the first time (in that case, no previous child exists).
          **/
         if(childIndex > 257)
         {
-            //table[childIndex - 1].symbol = *result;
-            assert(childIndex - 1 < MAX_CHILD && childIndex - 1 >= 0);
-                table[childIndex - 1].length++;
-            assert(currentIndex < MAX_CHILD && currentIndex >= 0);
-                CELL_TYPE LENGTH = table[childIndex - 1].length - 1;
-                printf("currentIndex: %u", currentIndex);
-                uint8_t val = table[currentIndex].word[0];
-                table[childIndex - 1].word[LENGTH] = val;
-            printf("aggiorno con %u il figlio %i\n",table[currentIndex].word[0],childIndex-1);
+	    struct Node* lastChild = &(table[childIndex - 1]);
+            lastChild->word[lastChild->length] = current->word[0];
+	    lastChild->length++;
+            printf("aggiorno con %u il figlio %i\n",current->word[0],childIndex-1);
         }
-        assert(currentIndex < MAX_CHILD && currentIndex >= 0);
-        result = table[currentIndex].word;
-        length = table[currentIndex].length;
+        result = current->word;
+        length = current->length;
         if(fwrite(result, 1, length, outputFile) != length)
         {
             printf("errore in scrittura\n\n");
@@ -84,17 +79,15 @@ int decompress(FILE* inputFile, FILE* outputFile)
             goto exceptionHandler;
         }
         printf("ho scritto %s\n",result);
-        //table[childIndex].father = currentIndex;
-        assert(childIndex < MAX_CHILD && childIndex >= 0);
-        table[childIndex].length = length;
-        table[childIndex].word = malloc(length + 1);
-        if(table[childIndex].word == NULL)
+	current = &(table[childIndex]);
+        current->length = length;
+        current->word = malloc(length + 1);
+        if(current->word == NULL)
         {
             printf("fallisce la malloc\n\n");
             goto exceptionHandler;
         }
-        assert(childIndex < MAX_CHILD && childIndex >= 0);
-        bcopy(result,table[childIndex].word, length); //DEPRECATED
+        bcopy(result,current->word, length);
         printf("ho creato il figlio %i\n",childIndex);
         //stava quì
         childIndex++;
