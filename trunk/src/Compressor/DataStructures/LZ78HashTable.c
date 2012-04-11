@@ -42,11 +42,9 @@ HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
     int i = 0;
     for (; i < sizeof(HASH_INDEX) ; i++)
         index ^= (index << 5) + (index >> 2) + ((INDEX_TYPE)(keyArray[i]));
-    index %= MAX_CHILD*2;
+    index %= MAX_CHILD*2; //TODO lento
     return index;
 }
-
-//TODO if table!= null ovunque??
 
 int hashInsert
 (
@@ -54,23 +52,45 @@ int hashInsert
     INDEX_TYPE fatherIndex,
     uint8_t* childValue,
     INDEX_TYPE childIndex
-) //TODO inline??
+)
 {
-    //è tutto molto lento, inoltre gli INDEX_TYPE sono un casino, non è proprio
-    //bello che siano uguali ai CELL_TYPE
+    if(table == NULL) return -1;
     HASH_INDEX index = hashFunction(fatherIndex, (INDEX_TYPE)(*childValue));
-    INDEX_TYPE i = 0;
-    while(table[index].childIndex != ROOT_INDEX) //lento
+    //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
+    while(table[index].childIndex != ROOT_INDEX) //collision, find first empty. Slow but it's done only in case of collision
     {
-        index = (index + 1)%(MAX_CHILD*2); //lento
-        i++;
-        if(i == MAX_CHILD*2) break;
+        index = (index + 1)%(MAX_CHILD*2);
+        //i++; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
+        //if(i == MAX_CHILD*2) break; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
     }
-    if(table[index].childIndex != ROOT_INDEX) return -1;
-    table[index].childIndex = childIndex; //lento
-    table[index].fatherIndex = fatherIndex; //lento
-    table[index].childValue = *childValue; //lento
+    //if(table[index].childIndex != ROOT_INDEX) return -1; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
+    table[index].childIndex = childIndex; //TODO lento
+    table[index].fatherIndex = fatherIndex; //TODO lento
+    table[index].childValue = *childValue; //TODO lento
+    
     return 0;
+}
+
+INDEX_TYPE hashLookup
+(
+    struct LZ78HashTableEntry* table,
+    INDEX_TYPE fatherIndex,
+    uint8_t* childValue
+)
+{
+    if(table == NULL) return -1;
+    HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
+    HASH_INDEX i = 0;
+    while //slow but it's done only in case of collision
+    (
+        (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)
+    )
+    {
+        index = (index + 1)%(MAX_CHILD*2); //slow but it's done only in case of collision
+        i++;
+        if(i == MAX_CHILD*2) return ROOT_INDEX;
+    }
+    return table[index].childIndex;
 }
 
 struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
@@ -79,10 +99,10 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
     uint8_t currentValue = 0;
     if(table != NULL)
     {
-        for(; i-- ;) table[i].childIndex = ROOT_INDEX;
-        for(i = 0 ; i < 256; i++) //i caratteri ascii coincidono con il loro indice
+        for(; i-- ;) table[i].childIndex = ROOT_INDEX; //TODO due for!!! mannaggia la miseria
+        for(i = 0 ; i < 256; i++) //TODO parametrico?
         {
-            currentValue = (uint8_t)i;
+            currentValue = (uint8_t)i;  //ascii value equals to index value
             if
             (
                 hashInsert
@@ -110,31 +130,6 @@ inline struct LZ78HashTableEntry* hashCreate()
 inline struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry* table)
 {
     return hashInitialize(table);
-}
-
-INDEX_TYPE hashLookup
-(
-    struct LZ78HashTableEntry* table,
-    INDEX_TYPE fatherIndex,
-    uint8_t* childValue
-) //TODO inline?
-{
-   // printf("INIZIO LOOKUP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-    HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
-    HASH_INDEX i = 0;
-    while
-    (
-        (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)
-    )
-    {
-        index = (index + 1)%(MAX_CHILD*2); //lento
-        i++;
-	//if(i==0)
-	  //  printf("PRIMA Iterazione \n");
-	//printf("Iterazione %4u\n",i);
-        if(i == MAX_CHILD*2) return ROOT_INDEX;
-    }
-    return table[index].childIndex; //lento
 }
 
 void hashDestroy(struct LZ78HashTableEntry* table){

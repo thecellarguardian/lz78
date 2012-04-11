@@ -61,14 +61,13 @@ int compress(FILE* inputFile, FILE* outputFile)
     while(!feof(inputFile) && !ferror(inputFile))
     {
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
-        for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
+        for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++) //TODO siamo sicuri che è + efficiente che richiamare la fread ogni volta??
         {
             printf("\nCerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
             child = hashLookup(hashTable, lookupIndex, &(readByte[byteIndex]));
-            //printf("Era nell'indice: %u\n", child);
-            if(child != ROOT_INDEX)
+            if(child != ROOT_INDEX) //ROOT_INDEX means NOT FOUND
             {
-                lookupIndex = child; //TODO giusto usare root_index?
+                lookupIndex = child;
                 printf("Trovato qui: %i\n",lookupIndex);
             }
             else
@@ -96,12 +95,14 @@ int compress(FILE* inputFile, FILE* outputFile)
                     //The next power of 2 mask is set
                     indexLengthMask = (indexLengthMask << 1) | 1;
                 }
-                //readByte value is also the right index to start with next time
-                lookupIndex = readByte[byteIndex]; //ROOT_INDEX??
-                if (childIndex == MAX_CHILD)
+                //readByte value is also the right index to start with next time 
+		//because you have to start from the last character recognized
+                lookupIndex = readByte[byteIndex];
+                if (childIndex == MAX_CHILD) //hash table is full
                 {
-                    hashReset(hashTable); //TODO controllare errore
-                    childIndex = ROOT_INDEX + 1;
+                    if(hashReset(hashTable) == NULL)
+			goto exceptionHandler; //hash table was not successfully created
+                    childIndex = ROOT_INDEX + 1; //starts from the beginning
                 }
             }
         }
@@ -109,26 +110,19 @@ int compress(FILE* inputFile, FILE* outputFile)
     if(ferror(inputFile))
     {
         errno = EBADFD;
-        goto exceptionHandler; //TODO: siamo sicuri???
+        goto exceptionHandler;
     }
     if
     (
-        writeBitBuffer(w, lookupIndex, indexLength) == -1 //TODO problema, chi mi dice che quì indexLength non sfora??
+        writeBitBuffer(w, lookupIndex, indexLength) == -1
         ||
         writeBitBuffer(w, ROOT_INDEX, indexLength) == -1 //TODO sarebbe meglio INITIAL_INDEX_LENGTH
     ) goto exceptionHandler;
     printf("ho scritto: %i\n", lookupIndex);
     printf("ho scritto: %i\n", ROOT_INDEX);
-    /*if(lookupIndex != ROOT_INDEX){ //se non era il fine file ma l'ultimo simbolo non riconosciuto
-       writeBitBuffer(w, ROOT_INDEX, INDEX_LENGTH);
-    }*/
     printf("COMPRESSORE OFFLINE\n");
     return closeBitwiseBufferedFile(w);
 
-    /**
-     * "With great power there must also come great responsibility!"
-     * (Stan Lee)
-     **/
     exceptionHandler:
         closeBitwiseBufferedFile(w);
         hashDestroy(hashTable);
