@@ -230,7 +230,6 @@ ssize_t readBitBuffer
                 (
                     bitFile->fileDescriptor, bitFile->buffer, BUFFER_BYTES
                 );
-            printf("CARICO IL BITBUFFER");
             if(err == -1) return -1;
             if(err == 0)
             {
@@ -260,7 +259,7 @@ ssize_t readBitBuffer
         bitFile->position += bitsToBeRead;
         readBits += bitsToBeRead;
     }
-    printf("Dal buffer è stato letto: %u\n\n",*data);
+    printf("Dal buffer è stato letto: %u su %i", *data, readBits);
     return readBits;
 }
 
@@ -295,7 +294,7 @@ ssize_t writeBitBuffer
             FULL_MASK : ((((CELL_TYPE)1) << bitsToBeWritten) - 1);
         bitFile->buffer[index] &= (((CELL_TYPE)1) << offset) - 1;
         bitFile->buffer[index] |= (data & mask) << offset;
-    length -= bitsToBeWritten;
+        length -= bitsToBeWritten;
         bitFile->position += bitsToBeWritten;
         bitFile->availableBits += bitsToBeWritten;
         if(bitFile->position >= BUFFER_CELLS*CELL_TYPE_LENGTH)
