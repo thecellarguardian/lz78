@@ -42,17 +42,17 @@ struct Node* tableCreate()
     {
         for(; i--;)
         {
-            current = table[i];
-	    current.length = 1;
-            current.word = malloc(1);
-            if(current.word == NULL)
+            current = &(table[i]);
+            current->length = 1;
+            current->word = malloc(1);
+            if(current->word == NULL)
             {
                 tableDestroy(table);
                 table = NULL;
                 break;
             }
-            current.word[0] = i;
-            printf("riempio la posizione %i con %c\n", i, current.word[0]);
+            current->word[0] = i;
+            printf("riempio la posizione %i con %c\n", i, current->word[0]);
         }
     }
     return table;

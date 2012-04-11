@@ -57,18 +57,19 @@ int hashInsert
     if(table == NULL) return -1;
     struct LZ78HashTableEntry* current;
     HASH_INDEX index = hashFunction(fatherIndex, (INDEX_TYPE)(*childValue));
-    //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
+    //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     while(table[index].childIndex != ROOT_INDEX) //collision, find first empty. Slow but it's done only in case of collision
     {
         index = (index + 1)%(MAX_CHILD*2);
-        //i++; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
-        //if(i == MAX_CHILD*2) break; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset 
+        //i++; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
+        //if(i == MAX_CHILD*2) break; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     }
     //if(table[index].childIndex != ROOT_INDEX) return -1; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
-    current.childIndex = childIndex;
-    current.fatherIndex = fatherIndex;
-    current.childValue = *childValue;
-    
+    current = &(table[index]);
+    current->childIndex = childIndex;
+    current->fatherIndex = fatherIndex;
+    current->childValue = *childValue;
+
     return 0;
 }
 
