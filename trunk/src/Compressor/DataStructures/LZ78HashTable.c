@@ -169,6 +169,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
             ) goto exceptionHandler;
         }
     }
+    //TODO ATTENZIONE!!! LA HASHTABLE VA INIZIALIZZATA TUTTA!!!! PERCHÉ in caso di collisione viene scorsa, anche parti non inizializzate!
     return table;
 
     exceptionHandler:
