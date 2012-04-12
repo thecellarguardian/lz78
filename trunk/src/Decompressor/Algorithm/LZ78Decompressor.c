@@ -110,7 +110,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
     }
     //printf("\nho letto FINE FILE\n");
     //printf("FINE DECOMPRESSIONE\n");
-    printf("CELL_TYPE_LENGTH: %i\n", CELL_TYPE_LENGTH);
     return 0;
 
     exceptionHandler:
