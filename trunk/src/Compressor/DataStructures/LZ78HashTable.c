@@ -136,7 +136,7 @@ INDEX_TYPE hashLookup
     if(table == NULL) return -1;
     HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
     HASH_INDEX i = 0;
-    if((table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
+    if((!table[index].empty) && (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
     while //slow but it's done only in case of collision
     (
         (!table[index].empty) && (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)

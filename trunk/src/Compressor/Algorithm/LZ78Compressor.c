@@ -87,7 +87,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                     ) == -1
                 ) goto exceptionHandler;
               //  printf("ho scritto: %i\n", lookupIndex);
-		//printf("Ho inserito %s nel figlio: %i\n",&readByte[byteIndex], childIndex);
+        //printf("Ho inserito %s nel figlio: %i\n",&readByte[byteIndex], childIndex);
                 childIndex++;
                 if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
@@ -96,13 +96,13 @@ int compress(FILE* inputFile, FILE* outputFile)
                     //The next power of 2 mask is set
                     indexLengthMask = (indexLengthMask << 1) | 1;
                 }
-                //readByte value is also the right index to start with next time 
-		//because you have to start from the last character recognized
+                //readByte value is also the right index to start with next time
+        //because you have to start from the last character recognized
                 lookupIndex = readByte[byteIndex];
                 if (childIndex == MAX_CHILD) //hash table is full
                 {
                     if(hashReset(hashTable,&collision) == NULL)
-			goto exceptionHandler; //hash table was not successfully created
+            goto exceptionHandler; //hash table was not successfully created
                     childIndex = ROOT_INDEX + 1; //starts from the beginning
                 }
             }
@@ -120,9 +120,10 @@ int compress(FILE* inputFile, FILE* outputFile)
         writeBitBuffer(w, ROOT_INDEX, indexLength) == -1 //TODO sarebbe meglio INITIAL_INDEX_LENGTH
     ) goto exceptionHandler;
     //printf("ho scritto: %i\n", lookupIndex);
-   // printf("ho scritto: %i\n", ROOT_INDEX);
-   // printf("COMPRESSORE OFFLINE\n");
-   printf("COLLSIONI: %i\n",collision);
+    // printf("ho scritto: %i\n", ROOT_INDEX);
+    // printf("COMPRESSORE OFFLINE\n");
+    printf("COLLSIONI: %i\n",collision);
+    hashDestroy(hashTable);
     return closeBitwiseBufferedFile(w);
 
     exceptionHandler:

@@ -48,7 +48,10 @@ int decompress(FILE* inputFile, FILE* outputFile)
     }
     table = tableCreate();
     if(table == NULL)
-    return -1;
+    {
+        closeBitwiseBufferedFile(r);
+        return -1;
+    }
    // printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
@@ -81,7 +84,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             goto exceptionHandler;
         }
        // printf("ho scritto %s\n",result);
-    current = &(table[childIndex]);
+        current = &(table[childIndex]);
         current->length = length;
         current->word = malloc(length + 1);
         if(current->word == NULL)
@@ -110,6 +113,8 @@ int decompress(FILE* inputFile, FILE* outputFile)
     }
     //printf("\nho letto FINE FILE\n");
     //printf("FINE DECOMPRESSIONE\n");
+    closeBitwiseBufferedFile(r);
+    tableDestroy(table);
     return 0;
 
     exceptionHandler:
