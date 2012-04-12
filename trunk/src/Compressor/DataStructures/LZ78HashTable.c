@@ -32,6 +32,7 @@ struct LZ78HashTableEntry
     uint8_t childValue;
     //value:
     INDEX_TYPE childIndex;
+    int empty;
 };
 
 HASH_INDEX SAXhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
@@ -107,8 +108,8 @@ int hashInsert
     struct LZ78HashTableEntry* current;
     HASH_INDEX index = hashFunction(fatherIndex, (INDEX_TYPE)(*childValue));
     //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
-    if(table[index].childIndex != ROOT_INDEX) (*collision)++;//PER TESTING!!!
-    while(table[index].childIndex != ROOT_INDEX) //collision, find first empty. Slow but it's done only in case of collision
+    if(!table[index].empty) (*collision)++;//PER TESTING!!!
+    while(!table[index].empty) //collision, find first empty. Slow but it's done only in case of collision
     {
         index = (index + 1)%(MAX_CHILD*2);
         //i++; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
@@ -119,6 +120,7 @@ int hashInsert
     current->childIndex = childIndex;
     current->fatherIndex = fatherIndex;
     current->childValue = *childValue;
+    current->empty = 0;
 
     return 0;
 }
@@ -137,14 +139,14 @@ INDEX_TYPE hashLookup
     if((table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
     while //slow but it's done only in case of collision
     (
-        (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)
+        (!table[index].empty) && (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)
     )
     {
         index = (index + 1)%(MAX_CHILD*2); //slow but it's done only in case of collision
         i++;
         if(i == MAX_CHILD*2) return ROOT_INDEX;
     }
-    return table[index].childIndex;
+    return (table[index].empty)? ROOT_INDEX : table[index].childIndex;
 }
 
 struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int* collision)
@@ -153,7 +155,10 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
     uint8_t currentValue = 0;
     if(table != NULL)
     {
-        for(; i-- ;) table[i].childIndex = ROOT_INDEX; //TODO due for!!! mannaggia la miseria
+        for(; i-- ;)
+        {
+            table[i].empty = 1;
+        }
         for(i = 0 ; i < ROOT_INDEX; i++)
         {
             currentValue = (uint8_t)i;  //ascii value equals to index value
@@ -169,7 +174,6 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
             ) goto exceptionHandler;
         }
     }
-    //TODO ATTENZIONE!!! LA HASHTABLE VA INIZIALIZZATA TUTTA!!!! PERCHÉ in caso di collisione viene scorsa, anche parti non inizializzate!
     return table;
 
     exceptionHandler:
