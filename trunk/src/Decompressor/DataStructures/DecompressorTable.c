@@ -61,7 +61,7 @@ struct Node* tableCreate()
 inline void tableReset(struct Node* table)
 {
     table = table + ROOT_INDEX;
-    int i = MAX_CHILD - 1;
+    int i = MAX_CHILD - ROOT_INDEX;
     for(; i--;) free(table[i].word);
     bzero(table, sizeof(struct Node) * MAX_CHILD);
 }
