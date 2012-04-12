@@ -111,7 +111,7 @@ int hashInsert
     if(!table[index].empty) (*collision)++;//PER TESTING!!!
     while(!table[index].empty) //collision, find first empty. Slow but it's done only in case of collision
     {
-        index = (index + 1)%(MAX_CHILD*2);
+        index = (index + 1)%(MAX_CHILD*2); //TODO lento
         //i++; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
         //if(i == MAX_CHILD*2) break; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     }
