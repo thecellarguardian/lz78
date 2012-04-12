@@ -34,7 +34,7 @@ struct LZ78HashTableEntry
     INDEX_TYPE childIndex;
 };
 
-HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
+HASH_INDEX SAXhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
 {
     HASH_INDEX index = 0;
     HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
@@ -46,7 +46,7 @@ HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
     return index;
 }
 
-HASH_INDEX BERNSTEINhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //Bernstein hash function
+HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //Bernstein hash function
 {
     HASH_INDEX index = 0;
     HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
@@ -67,10 +67,10 @@ HASH_INDEX ELFhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //ELF hash function
     int i = 0;
     for (; i < sizeof(HASH_INDEX) ; i++){
         index = ( index << 4 ) + ((INDEX_TYPE)(keyArray[i]));
-	g = index & 0xf0000000L;
-	if ( g != 0 )
-	    index ^= g >> 24;
-	index &= ~g;
+    g = index & 0xf0000000L;
+    if ( g != 0 )
+        index ^= g >> 24;
+    index &= ~g;
     }
     index %= MAX_CHILD*2; //TODO lento
     return index;
@@ -81,7 +81,7 @@ HASH_INDEX JSWhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //JSW hash function
     HASH_INDEX* tab = malloc(256*sizeof(HASH_INDEX));
     int j = 0;
     for(;j<256;j++){
-	tab[j]=j;
+    tab[j]=j;
     }
     HASH_INDEX index = 0;
     HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);

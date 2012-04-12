@@ -21,11 +21,10 @@
 
 #define ROOT_INDEX 256//TODO: DEVE essere 256, altrimenti non funziona nulla (vedi tableCreate)
 #define INITIAL_INDEX_LENGTH 9 //log_2(ROOT_INDEX)
-#define FINAL_INDEX_LENGTH 15 //log_2(MAX_CHILD)
+#define FINAL_INDEX_LENGTH 15 //era 15 log_2(MAX_CHILD), provato a 21
 #define INDEX_LENGTH_MASK 511 //111111111 (INITIAL_INDEX_LENGTH ones)
-#define MAX_CHILD 65535
-#define LOCAL_BYTE_BUFFER_LENGTH 2
+#define MAX_CHILD 65535//era 65535, provato a 1048575
+#define LOCAL_BYTE_BUFFER_LENGTH 2 //era 2, provato a 8
 #define LZ78_INTERPRETER "#!/usr/bin/env lz78"
-//TODO CELL_TYPE dipende da MAX_CHILD + attenzione agli include
-#define INDEX_TYPE uint16_t
-#define CELL_TYPE_LENGTH 16
+#define INDEX_TYPE uint16_t //era uint16_t, provato a 32
+#define CELL_TYPE_LENGTH 16// era 16, provato a 32

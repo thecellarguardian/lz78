@@ -60,5 +60,8 @@ struct Node* tableCreate()
 
 inline void tableReset(struct Node* table)
 {
-    tableDestroy(table + ROOT_INDEX + 1);
+    table = table + ROOT_INDEX;
+    int i = MAX_CHILD - 1;
+    for(; i--;) free(table[i].word);
+    bzero(table, sizeof(struct Node) * MAX_CHILD);
 }
