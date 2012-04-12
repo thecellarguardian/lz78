@@ -34,7 +34,19 @@ struct LZ78HashTableEntry
     INDEX_TYPE childIndex;
 };
 
-HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
+HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //my hash function
+{
+    HASH_INDEX index = 0;
+    HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
+    uint8_t* keyArray = ((uint8_t*)&key);
+    int i = 0;
+    for (; i < sizeof(HASH_INDEX) ; i++)
+        index ^= (index << 5) + (index >> 2) + ((INDEX_TYPE)(keyArray[i]));
+    index %= MAX_CHILD*2; //TODO lento
+    return index;
+}
+
+HASH_INDEX SAXhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
 {
     HASH_INDEX index = 0;
     HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
