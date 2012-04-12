@@ -76,7 +76,7 @@ HASH_INDEX ELFhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //ELF hash function
     return index;
 }
 
-HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //JSW hash function
+HASH_INDEX JSWhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //JSW hash function
 {
     HASH_INDEX* tab = malloc(256*sizeof(HASH_INDEX));
     int j = 0;
