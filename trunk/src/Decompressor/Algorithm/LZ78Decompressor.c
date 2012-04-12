@@ -39,6 +39,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     INDEX_TYPE length = 0;
     uint8_t* result;
     struct Node* table;
+    struct Node* current;
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
@@ -51,7 +52,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
-        struct Node* current;
+	currentIndex = 0;
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
         {
             //printf("sono stati letti meno di %i bit", indexLength);
@@ -80,7 +81,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             goto exceptionHandler;
         }
         printf("ho scritto %s\n",result);
-    current = &(table[childIndex]);
+	current = &(table[childIndex]);
         current->length = length;
         current->word = malloc(length + 1);
         if(current->word == NULL)
