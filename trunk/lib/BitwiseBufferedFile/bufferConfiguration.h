@@ -25,8 +25,12 @@
  * The other paramethers are automatically derived from CELL_TYPE_LENGTH.
  **/
 
+#ifdef EXTERN_BUFFER_CONFIGURATION_FILE
+    #include EXTERN_BUFFER_CONFIGURATION_FILE
+#endif
+
 #ifndef CELL_TYPE_LENGTH
-    #define CELL_TYPE_LENGTH 16 //TODO comunque non funziona la configurazione
+    #define CELL_TYPE_LENGTH 64 //TODO comunque non funziona la configurazione
 #endif //CELL_TYPE_LENGTH
 
 #ifndef BUFFER_CELLS

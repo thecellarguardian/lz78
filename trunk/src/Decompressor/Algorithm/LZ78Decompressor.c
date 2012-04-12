@@ -52,7 +52,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
    // printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
-	currentIndex = 0;
+    currentIndex = 0;
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
         {
             //printf("sono stati letti meno di %i bit", indexLength);
@@ -81,7 +81,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             goto exceptionHandler;
         }
        // printf("ho scritto %s\n",result);
-	current = &(table[childIndex]);
+    current = &(table[childIndex]);
         current->length = length;
         current->word = malloc(length + 1);
         if(current->word == NULL)
@@ -110,6 +110,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     }
     //printf("\nho letto FINE FILE\n");
     //printf("FINE DECOMPRESSIONE\n");
+    printf("CELL_TYPE_LENGTH: %i\n", CELL_TYPE_LENGTH);
     return 0;
 
     exceptionHandler:
