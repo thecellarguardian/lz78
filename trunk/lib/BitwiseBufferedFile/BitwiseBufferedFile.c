@@ -48,7 +48,7 @@ struct BitwiseBufferedFile* openBitwiseBufferedFile
     FILE* fileToSet
 )
 {
-    printf("OPEN: %i\n", CELL_TYPE_LENGTH);
+   // printf("OPEN: %i\n", CELL_TYPE_LENGTH);
     int fileDescriptor = -1;
     struct BitwiseBufferedFile* bitFile = NULL;
     if(mode != O_RDONLY && mode != O_WRONLY)
@@ -259,7 +259,7 @@ ssize_t readBitBuffer
         bitFile->position += bitsToBeRead;
         readBits += bitsToBeRead;
     }
-    printf("Dal buffer è stato letto: %u su %i", *data, readBits);
+    //printf("Dal buffer è stato letto: %u su %i", *data, readBits);
     return readBits;
 }
 
@@ -268,7 +268,7 @@ ssize_t writeBitBuffer
     struct BitwiseBufferedFile* bitFile, CELL_TYPE data, size_t length
 )
 {
-    printf("Nel buffer è stato scritto: %i\n\n",data);
+   // printf("Nel buffer è stato scritto: %i\n\n",data);
     int index;
     int offset;
     int bitsToBeWritten;

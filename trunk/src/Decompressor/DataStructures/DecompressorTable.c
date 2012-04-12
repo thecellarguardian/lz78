@@ -52,7 +52,7 @@ struct Node* tableCreate()
                 break;
             }
             current->word[0] = i;
-            printf("riempio la posizione %i con %c\n", i, current->word[0]);
+           // printf("riempio la posizione %i con %c\n", i, current->word[0]);
         }
     }
     return table;

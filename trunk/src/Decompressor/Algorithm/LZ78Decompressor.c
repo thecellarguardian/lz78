@@ -49,7 +49,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     table = tableCreate();
     if(table == NULL)
     return -1;
-    printf("INIZIO DECOMPRESSIONE\n");
+   // printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
 	currentIndex = 0;
@@ -58,7 +58,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             //printf("sono stati letti meno di %i bit", indexLength);
             goto exceptionHandler;
         }
-        printf("\nho letto %u\n", currentIndex);
+        // printf("\nho letto %u\n", currentIndex);
         if(currentIndex == ROOT_INDEX) break;
         current = &(table[currentIndex]);
          /**
@@ -70,27 +70,27 @@ int decompress(FILE* inputFile, FILE* outputFile)
         struct Node* lastChild = &(table[childIndex - 1]);
             lastChild->word[lastChild->length] = current->word[0];
         lastChild->length++;
-            printf("aggiorno con %u il figlio %i\n",current->word[0],childIndex-1);
+           // printf("aggiorno con %u il figlio %i\n",current->word[0],childIndex-1);
         }
         result = current->word;
         length = current->length;
         if(fwrite(result, 1, length, outputFile) != length)
         {
-            printf("errore in scrittura\n\n");
+            //printf("errore in scrittura\n\n");
             errno = EBADFD;
             goto exceptionHandler;
         }
-        printf("ho scritto %s\n",result);
+       // printf("ho scritto %s\n",result);
 	current = &(table[childIndex]);
         current->length = length;
         current->word = malloc(length + 1);
         if(current->word == NULL)
         {
-            printf("fallisce la malloc\n\n");
+            //printf("fallisce la malloc\n\n");
             goto exceptionHandler;
         }
         bcopy(result,current->word, length);
-        printf("ho creato il figlio %i\n",childIndex);
+        //printf("ho creato il figlio %i\n",childIndex);
         //stava quì
         childIndex++;
         if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
@@ -99,17 +99,17 @@ int decompress(FILE* inputFile, FILE* outputFile)
             indexLength++;
             //The next power of 2 mask is set
             indexLengthMask = (indexLengthMask << 1) | 1;
-            printf("aumento la lunghezza dell'indice \n");
+           // printf("aumento la lunghezza dell'indice \n");
         }
         if(childIndex == MAX_CHILD)
         {
             tableReset(table);
             childIndex = ROOT_INDEX + 1;
-            printf("reset della tabella\n");
+           // printf("reset della tabella\n");
         }
     }
-    printf("\nho letto FINE FILE\n");
-    printf("FINE DECOMPRESSIONE\n");
+    //printf("\nho letto FINE FILE\n");
+    //printf("FINE DECOMPRESSIONE\n");
     return 0;
 
     exceptionHandler:

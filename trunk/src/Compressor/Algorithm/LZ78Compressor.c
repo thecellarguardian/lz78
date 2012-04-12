@@ -37,13 +37,14 @@ int compress(FILE* inputFile, FILE* outputFile)
     INDEX_TYPE lookupIndex = ROOT_INDEX;
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     INDEX_TYPE child;
+    int collision; //TESTING
     if(inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
         if(w != NULL) closeBitwiseBufferedFile(w);
         return -1;
     }
-    hashTable = hashCreate();
+    hashTable = hashCreate(&collision);
     if(hashTable == NULL)
     {
         closeBitwiseBufferedFile(w);
@@ -57,22 +58,22 @@ int compress(FILE* inputFile, FILE* outputFile)
         fflush(outputFile) == EOF
     ) goto exceptionHandler;
     */
-    printf("COMPRESSORE ONLINE\n");
+  //  printf("COMPRESSORE ONLINE\n");
     while(!feof(inputFile) && !ferror(inputFile))
     {
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++) //TODO siamo sicuri che è + efficiente che richiamare la fread ogni volta??
         {
-            printf("\nCerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
-            child = hashLookup(hashTable, lookupIndex, &(readByte[byteIndex]));
+           // printf("\nCerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
+            child = hashLookup(hashTable, lookupIndex, &(readByte[byteIndex]), &collision);
             if(child != ROOT_INDEX) //ROOT_INDEX means NOT FOUND
             {
                 lookupIndex = child;
-                printf("Trovato qui: %i\n",lookupIndex);
+              //  printf("Trovato qui: %i\n",lookupIndex);
             }
             else
             {
-                printf("Non l'ho trovato allora ");
+              //  printf("Non l'ho trovato allora ");
                 if //OR short circuit evaluation exploited
                 (
                     writeBitBuffer(w, lookupIndex, indexLength) == -1
@@ -82,11 +83,11 @@ int compress(FILE* inputFile, FILE* outputFile)
                         hashTable,
                         lookupIndex,
                         &readByte[byteIndex],
-                        childIndex
+                        childIndex, &collision
                     ) == -1
                 ) goto exceptionHandler;
-                printf("ho scritto: %i\n", lookupIndex);
-		printf("Ho inserito %s nel figlio: %i\n",&readByte[byteIndex], childIndex);
+              //  printf("ho scritto: %i\n", lookupIndex);
+		//printf("Ho inserito %s nel figlio: %i\n",&readByte[byteIndex], childIndex);
                 childIndex++;
                 if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
@@ -100,7 +101,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                 lookupIndex = readByte[byteIndex];
                 if (childIndex == MAX_CHILD) //hash table is full
                 {
-                    if(hashReset(hashTable) == NULL)
+                    if(hashReset(hashTable,&collision) == NULL)
 			goto exceptionHandler; //hash table was not successfully created
                     childIndex = ROOT_INDEX + 1; //starts from the beginning
                 }
@@ -118,9 +119,10 @@ int compress(FILE* inputFile, FILE* outputFile)
         ||
         writeBitBuffer(w, ROOT_INDEX, indexLength) == -1 //TODO sarebbe meglio INITIAL_INDEX_LENGTH
     ) goto exceptionHandler;
-    printf("ho scritto: %i\n", lookupIndex);
-    printf("ho scritto: %i\n", ROOT_INDEX);
-    printf("COMPRESSORE OFFLINE\n");
+    //printf("ho scritto: %i\n", lookupIndex);
+   // printf("ho scritto: %i\n", ROOT_INDEX);
+   // printf("COMPRESSORE OFFLINE\n");
+   printf("COLLSIONI: %i\n",collision);
     return closeBitwiseBufferedFile(w);
 
     exceptionHandler:

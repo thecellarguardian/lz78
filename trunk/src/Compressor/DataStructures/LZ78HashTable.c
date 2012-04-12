@@ -34,7 +34,7 @@ struct LZ78HashTableEntry
     INDEX_TYPE childIndex;
 };
 
-HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
+HASH_INDEX SAXhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
 {
     HASH_INDEX index = 0;
     HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
@@ -46,18 +46,68 @@ HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
     return index;
 }
 
+HASH_INDEX BERNSTEINhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //Bernstein hash function
+{
+    HASH_INDEX index = 0;
+    HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
+    uint8_t* keyArray = ((uint8_t*)&key);
+    int i = 0;
+    for (; i < sizeof(HASH_INDEX) ; i++)
+        index = 33 * index + ((INDEX_TYPE)(keyArray[i]));
+    index %= MAX_CHILD*2; //TODO lento
+    return index;
+}
+
+HASH_INDEX ELFhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //ELF hash function
+{
+    HASH_INDEX index = 0;
+    HASH_INDEX g = 0;
+    HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
+    uint8_t* keyArray = ((uint8_t*)&key);
+    int i = 0;
+    for (; i < sizeof(HASH_INDEX) ; i++){
+        index = ( index << 4 ) + ((INDEX_TYPE)(keyArray[i]));
+	g = index & 0xf0000000L;
+	if ( g != 0 )
+	    index ^= g >> 24;
+	index &= ~g;
+    }
+    index %= MAX_CHILD*2; //TODO lento
+    return index;
+}
+
+HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //JSW hash function
+{
+    HASH_INDEX* tab = malloc(256*sizeof(HASH_INDEX));
+    int j = 0;
+    for(;j<256;j++){
+	tab[j]=j;
+    }
+    HASH_INDEX index = 0;
+    HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
+    uint8_t* keyArray = ((uint8_t*)&key);
+    int i = 0;
+    for (; i < sizeof(HASH_INDEX) ; i++)
+        index = ( index << 1 | index >> 31 ) ^ tab[((INDEX_TYPE)(keyArray[i]))];
+    index %= MAX_CHILD*2; //TODO lento
+    free(tab);
+    return index;
+}
+
 int hashInsert
 (
     struct LZ78HashTableEntry* table,
     INDEX_TYPE fatherIndex,
     uint8_t* childValue,
-    INDEX_TYPE childIndex
+    INDEX_TYPE childIndex,
+    int* collision
 )
 {
     if(table == NULL) return -1;
     struct LZ78HashTableEntry* current;
     HASH_INDEX index = hashFunction(fatherIndex, (INDEX_TYPE)(*childValue));
     //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
+    if(table[index].childIndex != ROOT_INDEX) (*collision)++;//PER TESTING!!!
     while(table[index].childIndex != ROOT_INDEX) //collision, find first empty. Slow but it's done only in case of collision
     {
         index = (index + 1)%(MAX_CHILD*2);
@@ -77,12 +127,14 @@ INDEX_TYPE hashLookup
 (
     struct LZ78HashTableEntry* table,
     INDEX_TYPE fatherIndex,
-    uint8_t* childValue
+    uint8_t* childValue,
+    int* collision
 )
 {
     if(table == NULL) return -1;
     HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
     HASH_INDEX i = 0;
+    if((table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
     while //slow but it's done only in case of collision
     (
         (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)
@@ -95,7 +147,7 @@ INDEX_TYPE hashLookup
     return table[index].childIndex;
 }
 
-struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
+struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int* collision)
 {
     int i = MAX_CHILD*2;
     uint8_t currentValue = 0;
@@ -112,7 +164,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
                     table,
                     ROOT_INDEX,
                     &currentValue,
-                    (INDEX_TYPE)currentValue
+                    (INDEX_TYPE)currentValue, collision
                 ) == -1
             ) goto exceptionHandler;
         }
@@ -124,14 +176,14 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table)
         return NULL;
 }
 
-inline struct LZ78HashTableEntry* hashCreate()
+inline struct LZ78HashTableEntry* hashCreate(int* collision)
 {
-    return hashInitialize((struct LZ78HashTableEntry*)malloc(HASH_TABLE_LENGTH));
+    return hashInitialize((struct LZ78HashTableEntry*)malloc(HASH_TABLE_LENGTH), collision);
 }
 
-inline struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry* table)
+inline struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry* table, int* collision)
 {
-    return hashInitialize(table);
+    return hashInitialize(table, collision);
 }
 
 void hashDestroy(struct LZ78HashTableEntry* table){

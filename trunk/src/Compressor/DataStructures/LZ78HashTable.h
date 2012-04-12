@@ -26,14 +26,14 @@
 #define HASH_INDEX uint32_t //il numero di bit che serve per indicizzare 2*MAX_CHILD
 #define HASH_TABLE_LENGTH MAX_CHILD * 2 * sizeof(struct LZ78HashTableEntry)
 
-struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry*);
+struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry*, int*);
 
-struct LZ78HashTableEntry* hashCreate();
+struct LZ78HashTableEntry* hashCreate(int*);
 
-INDEX_TYPE hashLookup(struct LZ78HashTableEntry*, INDEX_TYPE, uint8_t*);
+INDEX_TYPE hashLookup(struct LZ78HashTableEntry*, INDEX_TYPE, uint8_t*, int*);
 
-int hashInsert(struct LZ78HashTableEntry*, INDEX_TYPE, uint8_t*, INDEX_TYPE);
+int hashInsert(struct LZ78HashTableEntry*, INDEX_TYPE, uint8_t*, INDEX_TYPE, int*);
 
-struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry*);
+struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry*, int*);
 
 void hashDestroy(struct LZ78HashTableEntry*);

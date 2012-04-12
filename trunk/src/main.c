@@ -3,6 +3,7 @@
 
 int main(){
     FILE* f1 = fopen("rfc4227.txt","r");
+   // FILE* f1 = fopen("prova.pdf","r");
     FILE* f2 = fopen("prova2","w+");
     FILE* f3 = fopen("prova3","w+");
     printf("\n%i\n",compress(f1,f2));
