@@ -8,12 +8,10 @@ int main(){
     FILE* f3;
     compress(f1, f2);
     fclose(f1);
-    fclose(f2);
-    /*
     f2 = fopen("prova2","r");
     f3 = fopen("prova3","w+");
     decompress(f2,f3);
     fclose(f2);
-    fclose(f3);*/
+    fclose(f3);
     return 0;
 }
