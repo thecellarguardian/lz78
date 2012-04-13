@@ -155,7 +155,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
     uint8_t currentValue = 0;
     if(table != NULL)
     {
-        for(; i-- ;)
+        for(; i-- ;) //TODO provare bzero
         {
             table[i].empty = 1;
         }
