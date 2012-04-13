@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#define ROOT_INDEX 256//TODO: DEVE essere 256, altrimenti non funziona nulla (vedi tableCreate)
+#define ROOT_INDEX 0
 #define INITIAL_INDEX_LENGTH 9 //log_2(ROOT_INDEX)
 #define FINAL_INDEX_LENGTH 15 //era 15 log_2(MAX_CHILD), provato a 21
 #define INDEX_LENGTH_MASK 511 //111111111 (INITIAL_INDEX_LENGTH ones)

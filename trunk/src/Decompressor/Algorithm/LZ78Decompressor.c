@@ -34,7 +34,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, O_RDONLY, -1, inputFile);
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     size_t indexLength = INITIAL_INDEX_LENGTH;
-    INDEX_TYPE childIndex = ROOT_INDEX + 1;
+    INDEX_TYPE childIndex = 257;
     INDEX_TYPE currentIndex = 0;
     INDEX_TYPE length = 0;
     uint8_t* result;
@@ -70,9 +70,9 @@ int decompress(FILE* inputFile, FILE* outputFile)
          **/
         if(childIndex > 257)
         {
-        struct Node* lastChild = &(table[childIndex - 1]);
+	    struct Node* lastChild = &(table[childIndex - 1]);
             lastChild->word[lastChild->length] = current->word[0];
-        lastChild->length++;
+	    lastChild->length++;
            // printf("aggiorno con %u il figlio %i\n",current->word[0],childIndex-1);
         }
         result = current->word;
@@ -107,7 +107,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if(childIndex == MAX_CHILD)
         {
             tableReset(table);
-            childIndex = ROOT_INDEX + 1;
+            childIndex = 257;
            // printf("reset della tabella\n");
         }
     }

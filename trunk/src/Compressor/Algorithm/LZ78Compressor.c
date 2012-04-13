@@ -33,7 +33,7 @@ int compress(FILE* inputFile, FILE* outputFile)
     size_t bufferedBytes;
     int byteIndex = 0;
     struct LZ78HashTableEntry* hashTable;
-    INDEX_TYPE childIndex = ROOT_INDEX + 1;
+    INDEX_TYPE childIndex = 257;
     INDEX_TYPE lookupIndex = ROOT_INDEX;
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     INDEX_TYPE child;
@@ -103,7 +103,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                 {
                     if(hashReset(hashTable,&collision) == NULL)
             goto exceptionHandler; //hash table was not successfully created
-                    childIndex = ROOT_INDEX + 1; //starts from the beginning
+                    childIndex = 257; //starts from the beginning
                 }
             }
         }

@@ -36,11 +36,11 @@ void tableDestroy(struct Node* table)
 struct Node* tableCreate()
 {
     struct Node* table = calloc(MAX_CHILD, sizeof(struct Node));
-    int i = ROOT_INDEX;
+    int i = 1;
     struct Node* current;
     if(table != NULL)
     {
-        for(; i--;)
+        for(; i < 257; i++)
         {
             current = &(table[i]);
             current->length = 1;
@@ -51,7 +51,7 @@ struct Node* tableCreate()
                 table = NULL;
                 break;
             }
-            current->word[0] = i;
+            current->word[0] = i + 1;
            // printf("riempio la posizione %i con %c\n", i, current->word[0]);
         }
     }
@@ -60,8 +60,8 @@ struct Node* tableCreate()
 
 inline void tableReset(struct Node* table)
 {
-    table = table + ROOT_INDEX;
-    int i = MAX_CHILD - ROOT_INDEX;
+    table = table + 256;
+    int i = MAX_CHILD - 257;
     for(; i--;) free(table[i].word);
     bzero(table, sizeof(struct Node) * MAX_CHILD);
 }
