@@ -159,7 +159,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
         {
             table[i].empty = 1;
         }
-        for(i = 0 ; i < ROOT_INDEX; i++)
+        for(i = 0 ; i < ROOT_INDEX; i++) //TODO due cicli, peso
         {
             currentValue = (uint8_t)i;  //ascii value equals to index value
             if
