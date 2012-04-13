@@ -32,7 +32,7 @@ struct LZ78HashTableEntry
     uint8_t childValue;
     //value:
     INDEX_TYPE childIndex;
-    int empty;
+    int empty; //TODO newton ha trovato un modo per cui non serve empty
 };
 
 HASH_INDEX SAXhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
