@@ -70,9 +70,9 @@ int decompress(FILE* inputFile, FILE* outputFile)
          **/
         if(childIndex > 257)
         {
-	    struct Node* lastChild = &(table[childIndex - 1]);
+        struct Node* lastChild = &(table[childIndex - 1]);
             lastChild->word[lastChild->length] = current->word[0];
-	    lastChild->length++;
+        lastChild->length++;
            // printf("aggiorno con %u il figlio %i\n",current->word[0],childIndex-1);
         }
         result = current->word;
@@ -96,7 +96,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         //printf("ho creato il figlio %i\n",childIndex);
         //stava quì
         childIndex++;
-        if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
+        if((childIndex & indexLengthMask) == 0) //TODO: USARE LA DIVISIONE! A power of 2 is reached
         {
             //The length of the transmitted index is incremented
             indexLength++;

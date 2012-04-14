@@ -138,8 +138,8 @@ ssize_t loadBitBuffer(int fileDescriptor, CELL_TYPE* buffer, size_t count)
     }
     readBytes = n;
     #if CELL_TYPE_LENGTH != 8
-        int offset = (n & ((ssize_t)(MODULO_MASK)));
-        n >>= SHIFT_FACTOR;// n = n/(sizeof(CELL_TYPE));
+        int offset = (n%sizeof(CELL_TYPE)); //era & ((ssize_t)(MODULO_MASK))
+        n = n/(sizeof(CELL_TYPE));// era n >>= SHIFT_FACTOR;
         if(offset != 0) //if(n % sizeof(CELL_TYPE) != 0)
         {
             /*TODO gestire il caso in cui vengano letti un numero di byte non
@@ -168,8 +168,8 @@ int closeBitwiseBufferedFile(struct BitwiseBufferedFile* bitFile)
     }
     if(bitFile->mode == O_WRONLY && bitFile->availableBits != 0)
     {
-        int index = bitFile->position >> BITWISE_SHIFT_FACTOR;
-        int offset = bitFile->position & BITWISE_MODULO_MASK;
+        int index = bitFile->position/(sizeof(CELL_TYPE)*8); //era  >> BITWISE_SHIFT_FACTOR
+        int offset = bitFile->position%(sizeof(CELL_TYPE)*8); //era & BITWISE_MODULO_MASK
         if(offset)
         {
             bitFile->buffer[index] &= ((CELL_TYPE)1 << offset) - 1;
@@ -178,7 +178,7 @@ int closeBitwiseBufferedFile(struct BitwiseBufferedFile* bitFile)
         (
             bitFile->fileDescriptor,
             bitFile->buffer,
-            index*sizeof(CELL_TYPE) + (offset >> 3) + (offset? 1 : 0) //se è dentro il primo byte deve comunque dare 1
+            index*sizeof(CELL_TYPE) + (offset/8) + (offset > 0) //se è dentro il primo byte deve comunque dare 1
         );
     }
     error = close(bitFile->fileDescriptor);
@@ -237,8 +237,8 @@ ssize_t readBitBuffer
             bitFile->position = 0;
             bitFile->availableBits = err*8;
         }
-        index = (bitFile->position) >> BITWISE_SHIFT_FACTOR;
-        offset = (bitFile->position) & BITWISE_MODULO_MASK;
+        index = (bitFile->position)/(sizeof(CELL_TYPE)*8); //era  >> BITWISE_SHIFT_FACTOR
+        offset = (bitFile->position)%(sizeof(CELL_TYPE)*8); //era & BITWISE_MODULO_MASK
         bitsToBeRead =
             min
             (
@@ -283,8 +283,8 @@ ssize_t writeBitBuffer
     }
     while(length > 0)
     {
-        index = (bitFile->position) >> BITWISE_SHIFT_FACTOR;
-        offset = (bitFile->position) & BITWISE_MODULO_MASK;
+        index = (bitFile->position)/(sizeof(CELL_TYPE)*8); //era & BITWISE_SHIFT_FACTOR
+        offset = (bitFile->position)%(sizeof(CELL_TYPE)*8); //era & BITWISE_MODULO_MASK
         bitsToBeWritten = min(CELL_TYPE_LENGTH - offset, length);
         /* The following check addresses the rotate shift problem */
         mask =
