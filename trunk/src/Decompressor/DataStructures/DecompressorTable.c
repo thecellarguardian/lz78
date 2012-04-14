@@ -51,7 +51,7 @@ struct Node* tableCreate()
                 table = NULL;
                 break;
             }
-            current->word[0] = i + 1;
+            current->word[0] = i;
            // printf("riempio la posizione %i con %c\n", i, current->word[0]);
         }
     }
