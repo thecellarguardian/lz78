@@ -60,8 +60,8 @@ struct Node* tableCreate()
 
 inline void tableReset(struct Node* table)
 {
-    table = table + 256;
-    int i = MAX_CHILD - 257;
+    table = table + 257;
+    int i = MAX_CHILD - 257; //TODO siamo sicuri?
     for(; i--;) free(table[i].word);
     bzero(table, sizeof(struct Node) * MAX_CHILD);
 }
