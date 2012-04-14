@@ -155,7 +155,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
         bzero(table, HASH_TABLE_LENGTH);
         for(i = 1 ; i < 257; i++) 
         {
-            currentValue = (uint8_t)i + 1;  //ascii value +1 equals to index value
+            currentValue = (uint8_t)i - 1;  //ascii value - 1 equals to index value
             if
             (
                 hashInsert
