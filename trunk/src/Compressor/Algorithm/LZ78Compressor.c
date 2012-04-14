@@ -37,7 +37,7 @@ int compress(FILE* inputFile, FILE* outputFile)
     INDEX_TYPE lookupIndex = ROOT_INDEX;
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     INDEX_TYPE child;
-    int collision; //TESTING
+    int collision = 0; //TESTING
     if(inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
