@@ -163,7 +163,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
                     table,
                     ROOT_INDEX,
                     &currentValue,
-                    (INDEX_TYPE)currentValue, collision
+                    (INDEX_TYPE)(currentValue + 1), collision
                 ) == -1
             ) goto exceptionHandler;
         }
