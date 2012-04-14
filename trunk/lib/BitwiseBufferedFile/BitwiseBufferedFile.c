@@ -81,7 +81,7 @@ struct BitwiseBufferedFile* openBitwiseBufferedFile
 
 ssize_t storeBitBuffer(int fileDescriptor, CELL_TYPE* buffer, size_t count)
 {
-    ssize_t n = count - 1;
+    ssize_t n = count/sizeof(CELL_TYPE) + (count%sizeof(CELL_TYPE) > 0);
     ssize_t writtenBytes = 0;
     uint8_t* byteBuffer = (uint8_t*)buffer; // buffer seen as a byte buffer
     if
@@ -131,7 +131,7 @@ ssize_t loadBitBuffer(int fileDescriptor, CELL_TYPE* buffer, size_t count)
     }
     while(n < count)
     {
-        readBytes = read(fileDescriptor, buffer + n , count - n);
+        readBytes = read(fileDescriptor, byteBuffer + n, count - n);
         if(readBytes == -1) return -1;
         n += readBytes;
         if(readBytes == 0) break;
@@ -147,9 +147,7 @@ ssize_t loadBitBuffer(int fileDescriptor, CELL_TYPE* buffer, size_t count)
             n++;
             buffer[n] &= ((((CELL_TYPE)1) << offset*8) - 1);
         }
-    #endif
-    // n refers to the number of read cells
-    #if CELL_TYPE_LENGTH != 8
+        // n refers to the number of read cells
         /**
          * Due to portability reasons, a standard serialization format must be
          * used. The cost of the following conversion is O(BUFFER_CELLS), but it
@@ -180,7 +178,7 @@ int closeBitwiseBufferedFile(struct BitwiseBufferedFile* bitFile)
         (
             bitFile->fileDescriptor,
             bitFile->buffer,
-            index*sizeof(CELL_TYPE) + (offset >> 3) + (offset ? 1 : 0) //se è dentro il primo byte deve comunque dare 1
+            index*sizeof(CELL_TYPE) + (offset >> 3) + (offset? 1 : 0) //se è dentro il primo byte deve comunque dare 1
         );
     }
     error = close(bitFile->fileDescriptor);
