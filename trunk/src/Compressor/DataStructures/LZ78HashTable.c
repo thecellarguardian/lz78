@@ -34,6 +34,283 @@ struct LZ78HashTableEntry
     INDEX_TYPE childIndex;
 };
 
+uint8_t permutationTable[256] =
+{
+    122,
+    87,
+    98,
+    207,
+    203,
+    230,
+    76,
+    194,
+    50,
+    136,
+    126,
+    142,
+    202,
+    24,
+    58,
+    253,
+    174,
+    69,
+    161,
+    9,
+    8,
+    109,
+    62,
+    191,
+    244,
+    215,
+    22,
+    119,
+    52,
+    129,
+    40,
+    188,
+    35,
+    173,
+    13,
+    49,
+    242,
+    81,
+    28,
+    38,
+    159,
+    57,
+    84,
+    2,
+    214,
+    137,
+    42,
+    252,
+    31,
+    66,
+    186,
+    135,
+    223,
+    169,
+    247,
+    96,
+    53,
+    82,
+    21,
+    110,
+    112,
+    167,
+    164,
+    100,
+    56,
+    200,
+    147,
+    14,
+    85,
+    23,
+    178,
+    51,
+    70,
+    199,
+    101,
+    196,
+    182,
+    7,
+    239,
+    72,
+    17,
+    79,
+    151,
+    27,
+    205,
+    248,
+    140,
+    91,
+    39,
+    32,
+    25,
+    63,
+    67,
+    128,
+    228,
+    12,
+    48,
+    150,
+    46,
+    88,
+    121,
+    139,
+    130,
+    184,
+    11,
+    124,
+    90,
+    233,
+    180,
+    120,
+    179,
+    132,
+    218,
+    41,
+    113,
+    177,
+    141,
+    138,
+    187,
+    172,
+    206,
+    240,
+    146,
+    158,
+    78,
+    225,
+    176,
+    108,
+    246,
+    171,
+    148,
+    44,
+    4,
+    234,
+    166,
+    115,
+    156,
+    189,
+    106,
+    104,
+    221,
+    149,
+    43,
+    26,
+    231,
+    55,
+    251,
+    217,
+    211,
+    229,
+    190,
+    111,
+    133,
+    216,
+    118,
+    16,
+    192,
+    162,
+    175,
+    105,
+    3,
+    0,
+    123,
+    95,
+    64,
+    237,
+    195,
+    75,
+    68,
+    170,
+    37,
+    65,
+    145,
+    185,
+    83,
+    116,
+    15,
+    157,
+    127,
+    45,
+    204,
+    245,
+    243,
+    1,
+    153,
+    86,
+    224,
+    209,
+    155,
+    29,
+    193,
+    198,
+    102,
+    97,
+    226,
+    201,
+    227,
+    10,
+    117,
+    222,
+    213,
+    154,
+    107,
+    131,
+    143,
+    74,
+    103,
+    99,
+    93,
+    255,
+    236,
+    232,
+    152,
+    134,
+    47,
+    60,
+    94,
+    168,
+    18,
+    59,
+    210,
+    5,
+    30,
+    19,
+    249,
+    241,
+    197,
+    160,
+    183,
+    219,
+    208,
+    89,
+    238,
+    165,
+    6,
+    254,
+    33,
+    92,
+    163,
+    80,
+    71,
+    36,
+    144,
+    212,
+    114,
+    250,
+    34,
+    235,
+    73,
+    77,
+    181,
+    54,
+    220,
+    61,
+    20,
+    125
+};
+
+
+HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //PEARSON hash function
+{
+    uint8_t h = 0;
+    int i = 0;
+    int index;
+    HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
+    uint8_t* keyArray = ((uint8_t*)&key);
+    for(; i < sizeof(HASH_INDEX); i++)
+    {
+        index = h ^ keyArray[i];
+        h = permutationTable[index];
+        keyArray[i] = h;
+    }
+    return key%(HASH_TABLE_ENTRIES);
+}
+
 HASH_INDEX SAXhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
 {
     HASH_INDEX index = 0;
@@ -42,11 +319,11 @@ HASH_INDEX SAXhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
     int i = 0;
     for (; i < sizeof(HASH_INDEX) ; i++)
         index ^= (index << 5) + (index >> 2) + ((INDEX_TYPE)(keyArray[i]));
-    index %= MAX_CHILD*2; //TODO lento
+    index %= HASH_TABLE_ENTRIES; //TODO lento
     return index;
 }
 
-HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //Bernstein hash function
+HASH_INDEX BERNSTEINhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //Bernstein hash function
 {
     HASH_INDEX index = 0;
     HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
@@ -54,7 +331,7 @@ HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //Bernstein hash funct
     int i = 0;
     for (; i < sizeof(HASH_INDEX) ; i++)
         index = 33 * index + ((INDEX_TYPE)(keyArray[i]));
-    index %= MAX_CHILD*2; //TODO lento
+    index %= HASH_TABLE_ENTRIES; //TODO lento
     return index;
 }
 
@@ -72,7 +349,7 @@ HASH_INDEX ELFhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //ELF hash function
         index ^= g >> 24;
     index &= ~g;
     }
-    index %= MAX_CHILD*2; //TODO lento
+    index %= HASH_TABLE_ENTRIES; //TODO lento
     return index;
 }
 
@@ -89,7 +366,7 @@ HASH_INDEX JSWhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //JSW hash function
     int i = 0;
     for (; i < sizeof(HASH_INDEX) ; i++)
         index = ( index << 1 | index >> 31 ) ^ tab[((INDEX_TYPE)(keyArray[i]))];
-    index %= MAX_CHILD*2; //TODO lento
+    index %= HASH_TABLE_ENTRIES; //TODO lento
     free(tab);
     return index;
 }
@@ -110,9 +387,9 @@ int hashInsert
     if(table[index].childValue) (*collision)++;//PER TESTING!!!
     while(table[index].childValue) //collision, find first empty. Slow but it's done only in case of collision
     {
-        index = (index + 1)%(MAX_CHILD*2); //TODO lento
+        index = (index + 1)%(HASH_TABLE_ENTRIES); //TODO lento ATTENZIONE
         //i++; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
-        //if(i == MAX_CHILD*2) break; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
+        //if(i == HASH_TABLE_ENTRIES) break; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     }
     //if(table[index].childIndex != ROOT_INDEX) return -1; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     current = &(table[index]);
@@ -133,15 +410,15 @@ INDEX_TYPE hashLookup
     if(table == NULL) return -1;
     HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
     //HASH_INDEX i = 0;
-    if((table[index].childValue) && (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!! 
+    if((table[index].childValue) && (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
     while //slow but it's done only in case of collision
     (
         (table[index].childValue) && (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)
     )
     {
-        index = (index + 1)%(MAX_CHILD*2); //slow but it's done only in case of collision //TODO è il modo più efficiente?
+        index = (index + 1)%(HASH_TABLE_ENTRIES); //slow but it's done only in case of collision //TODO è il modo più efficiente? ATTENZIONE
         //i++;
-        //if(i == MAX_CHILD*2) return ROOT_INDEX;
+        //if(i == HASH_TABLE_ENTRIES) return ROOT_INDEX;
     }
     return (table[index].childValue)?  table[index].childIndex : ROOT_INDEX;
 }
@@ -153,7 +430,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
     if(table != NULL)
     {
         bzero(table, HASH_TABLE_LENGTH);
-        for(; i < 256; i++) 
+        for(; i < 256; i++)
         {
             currentValue = (uint8_t)i;  //ascii value - 1 equals to index value
             if

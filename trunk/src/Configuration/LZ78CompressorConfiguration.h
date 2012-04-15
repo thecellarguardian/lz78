@@ -21,7 +21,7 @@
 
 #define ROOT_INDEX 0
 #define INITIAL_INDEX_LENGTH 9 //log_2(ROOT_INDEX)
-#define FINAL_INDEX_LENGTH 15 //era 15 log_2(MAX_CHILD), provato a 21
+#define FINAL_INDEX_LENGTH 16 //era 15 log_2(MAX_CHILD), provato a 21
 #define INDEX_LENGTH_MASK 511 //111111111 (INITIAL_INDEX_LENGTH ones)
 #define MAX_CHILD 65535//era 65535, provato a 1048575
 #define LOCAL_BYTE_BUFFER_LENGTH 2 //era 2, provato a 8
