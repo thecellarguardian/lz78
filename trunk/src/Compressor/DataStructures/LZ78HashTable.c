@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include "LZ78HashTable.h"
 #include "../../Configuration/LZ78CompressorConfiguration.h"
 
@@ -327,7 +327,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
     uint8_t currentValue = 0;
     if(table != NULL)
     {
-        bzero(table, HASH_TABLE_LENGTH);
+        memset(table, 0, HASH_TABLE_LENGTH);
         for(; i < 256; i++)
         {
             currentValue = (uint8_t)i;  //ascii value - 1 equals to index value
@@ -361,6 +361,6 @@ inline struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry* table, in
 }
 
 void hashDestroy(struct LZ78HashTableEntry* table){
-    bzero(table, HASH_TABLE_LENGTH);
+    memset(table, 0, HASH_TABLE_LENGTH);
     free(table);
 }

@@ -40,6 +40,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     uint8_t* result;
     struct Node* table;
     struct Node* current;
+    struct Node* lastChild;
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
@@ -70,9 +71,9 @@ int decompress(FILE* inputFile, FILE* outputFile)
          **/
         if(childIndex > 257)
         {
-        struct Node* lastChild = &(table[childIndex - 1]);
+            lastChild = &(table[childIndex - 1]);
             lastChild->word[lastChild->length] = current->word[0];
-        lastChild->length++;
+            lastChild->length++;
            // printf("aggiorno con %u il figlio %i\n",current->word[0],childIndex-1);
         }
         result = current->word;
@@ -83,7 +84,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             errno = EBADFD;
             goto exceptionHandler;
         }
-       // printf("ho scritto %s\n",result);
+        // printf("ho scritto %s\n",result);
         current = &(table[childIndex]);
         current->length = length;
         current->word = malloc(length + 1);
@@ -92,7 +93,8 @@ int decompress(FILE* inputFile, FILE* outputFile)
             //printf("fallisce la malloc\n\n");
             goto exceptionHandler;
         }
-        bcopy(result,current->word, length);
+        memcpy(current->word, result, length);
+        //bcopy(result,current->word, length);
         //printf("ho creato il figlio %i\n",childIndex);
         //stava quì
         childIndex++;
