@@ -284,7 +284,7 @@ int hashInsert
     if(table[index].childValue) (*collision)++;//PER TESTING!!!
     while(table[index].childValue) //collision, find first empty. Slow but it's done only in case of collision
     {
-        if(++index == HASH_TABLE_ENTRIES) index = 0; //TODO lento ATTENZIONE
+        index = (index+1)%HASH_TABLE_ENTRIES;
     }
     //if(table[index].childIndex != ROOT_INDEX) return -1; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     current = &(table[index]);
@@ -316,7 +316,7 @@ INDEX_TYPE hashLookup
         )
     )
     {
-        if(++index == HASH_TABLE_ENTRIES) index = 0; //TODO è il modo più efficiente? ATTENZIONE
+        index = (index+1)%HASH_TABLE_ENTRIES; //TODO è il modo più efficiente? ATTENZIONE
     }
     return (table[index].childValue)? table[index].childIndex : ROOT_INDEX;
 }

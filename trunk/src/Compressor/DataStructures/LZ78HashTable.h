@@ -25,7 +25,7 @@
 
 #define HASH_INDEX uint32_t //era uint32_t, il numero di bit che serve per indicizzare 2*MAX_CHILD, provato a 64
 #define HASH_TABLE_LENGTH (MAX_CHILD*2)*sizeof(struct LZ78HashTableEntry)
-#define HASH_TABLE_ENTRIES MAX_CHILD*2
+#define HASH_TABLE_ENTRIES (MAX_CHILD*2)
 
 struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry*, int*);
 
