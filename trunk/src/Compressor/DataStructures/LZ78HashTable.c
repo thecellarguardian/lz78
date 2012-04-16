@@ -279,10 +279,10 @@ int hashInsert
 {
     if(table == NULL) return -1;
     struct LZ78HashTableEntry* current;
-    HASH_INDEX index = hashFunction(fatherIndex, (INDEX_TYPE)(*childValue));
+    HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)(*childValue)));
     //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
-    if(table[index].childValue) (*collision)++;//PER TESTING!!!
-    while(table[index].childValue) //collision, find first empty. Slow but it's done only in case of collision
+    if(table[index].childIndex) (*collision)++;//PER TESTING!!!
+    while(table[index].childIndex) //collision, find first empty. Slow but it's done only in case of collision
     {
         index = (index+1)%HASH_TABLE_ENTRIES;
     }
@@ -303,22 +303,24 @@ INDEX_TYPE hashLookup
 )
 {
     if(table == NULL) return -1;
-    HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)*childValue));
+    HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)(*childValue)));
     //HASH_INDEX i = 0;
-    if((table[index].childValue) && (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
+    if((table[index].childIndex) && (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
     while //slow but it's done only in case of collision
     (
-        (table[index].childValue) &&
         (
-            table[index].childValue  != *childValue
-            ||
-            table[index].fatherIndex != fatherIndex
+            (table[index].childIndex) &&
+            (
+                table[index].childValue  != *childValue
+                ||
+                table[index].fatherIndex != fatherIndex
+            )
         )
     )
     {
         index = (index+1)%HASH_TABLE_ENTRIES; //TODO è il modo più efficiente? ATTENZIONE
     }
-    return (table[index].childValue)? table[index].childIndex : ROOT_INDEX;
+    return (table[index].childIndex)? table[index].childIndex : ROOT_INDEX;
 }
 
 struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int* collision)
@@ -338,9 +340,10 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
                     table,
                     ROOT_INDEX,
                     &currentValue,
-                    ((INDEX_TYPE)(((INDEX_TYPE)currentValue) + (INDEX_TYPE)1)), collision
+                    ((INDEX_TYPE)(((INDEX_TYPE)currentValue) + ((INDEX_TYPE)1))), collision
                 ) == -1
             ) goto exceptionHandler;
+            printf("%u\n", table[0].childIndex);
         }
     }
     return table;
