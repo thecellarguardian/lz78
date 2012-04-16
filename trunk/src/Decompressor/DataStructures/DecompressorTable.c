@@ -61,7 +61,7 @@ struct Node* tableCreate()
 inline void tableReset(struct Node* table)
 {
     table = table + 257;
-    int i = MAX_CHILD - 256;
+    int i = MAX_CHILD - 257;
     for(; i--;) free(table[i].word);
-    memset(table, 0, sizeof(struct Node)*MAX_CHILD);
+    memset(table, 0, sizeof(struct Node)*(MAX_CHILD - 257));
 }
