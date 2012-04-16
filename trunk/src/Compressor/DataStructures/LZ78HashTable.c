@@ -343,7 +343,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
                     ((INDEX_TYPE)(((INDEX_TYPE)currentValue) + ((INDEX_TYPE)1))), collision
                 ) == -1
             ) goto exceptionHandler;
-            printf("%u\n", table[0].childIndex);
+            //printf("%u\n", table[0].childIndex);
         }
     }
     return table;

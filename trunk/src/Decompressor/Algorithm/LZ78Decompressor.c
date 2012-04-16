@@ -28,7 +28,6 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
 
 int decompress(FILE* inputFile, FILE* outputFile)
 {
@@ -62,7 +61,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         {
             goto exceptionHandler;
         }
-        printf("\nho letto %u\n", currentIndex);
+        //printf("\nho letto %u\n", currentIndex);
         if(currentIndex == ROOT_INDEX)
         {
             break;
