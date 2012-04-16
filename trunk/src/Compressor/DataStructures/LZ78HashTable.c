@@ -220,7 +220,7 @@ HASH_INDEX SAXhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //SAX hash function
     return index;
 }
 
-HASH_INDEX BERNSTEINhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //Bernstein hash function
+HASH_INDEX BARNSTEINhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //Bernstein hash function
 {
     HASH_INDEX index = 0;
     HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
@@ -338,7 +338,7 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int*
                     table,
                     ROOT_INDEX,
                     &currentValue,
-                    (INDEX_TYPE)(currentValue + 1), collision
+                    ((INDEX_TYPE)(((INDEX_TYPE)currentValue) + (INDEX_TYPE)1)), collision
                 ) == -1
             ) goto exceptionHandler;
         }

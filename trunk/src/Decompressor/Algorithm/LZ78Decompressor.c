@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 int decompress(FILE* inputFile, FILE* outputFile)
 {
@@ -56,14 +57,16 @@ int decompress(FILE* inputFile, FILE* outputFile)
    // printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
-    currentIndex = 0;
+        currentIndex = 0;
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
         {
-            //printf("sono stati letti meno di %i bit", indexLength);
             goto exceptionHandler;
         }
-        // printf("\nho letto %u\n", currentIndex);
-        if(currentIndex == ROOT_INDEX) break;
+        printf("\nho letto %u\n", currentIndex);
+        if(currentIndex == ROOT_INDEX)
+        {
+            break;
+        }
         current = &(table[currentIndex]);
          /**
          * The previous child has to be updated with the current leading byte,

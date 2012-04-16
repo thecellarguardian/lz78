@@ -58,7 +58,7 @@ int compress(FILE* inputFile, FILE* outputFile)
         fflush(outputFile) == EOF
     ) goto exceptionHandler;
     */
-  //  printf("COMPRESSORE ONLINE\n");
+    //  printf("COMPRESSORE ONLINE\n");
     while(!feof(inputFile) && !ferror(inputFile))
     {
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
