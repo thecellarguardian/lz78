@@ -28,3 +28,6 @@
 #define LZ78_INTERPRETER "#!/usr/bin/env lz78"
 #define INDEX_TYPE uint16_t //era uint16_t, provato a 32
 #define CELL_TYPE_LENGTH 16// era 16, provato a 32
+#define HASH_INDEX uint32_t //era uint32_t, il numero di bit che serve per indicizzare 2*MAX_CHILD, provato a 64
+#define HASH_TABLE_LENGTH (131072)*sizeof(struct LZ78HashTableEntry)
+#define HASH_TABLE_ENTRIES (131072)
