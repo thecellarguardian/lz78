@@ -1,5 +1,5 @@
 /**
- * @file DecompressorTable.h
+ * @file LZ78DecompressorTable.h
  * @author Cosimo Sacco <cosimosacco@gmail.com>
  * @author Davide Silvestri <davidesil.web@gmail.com>
  *
@@ -23,14 +23,14 @@
 #include "../../../lib/BitwiseBufferedFile/bufferConfiguration.h"
 #include <stdint.h>
 
-struct Node
+struct LZ78DecompressorTableEntry
 {
     uint8_t* word;
     CELL_TYPE length; // worst case = tree levels
 };
 
-struct Node* tableCreate();
+struct LZ78DecompressorTableEntry* tableCreate();
 
-void tableReset(struct Node* table);
+void tableReset(struct LZ78DecompressorTableEntry* table);
 
-void tableDestroy(struct Node* table);
+void tableDestroy(struct LZ78DecompressorTableEntry* table);

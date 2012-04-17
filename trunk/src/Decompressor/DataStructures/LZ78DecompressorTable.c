@@ -1,5 +1,5 @@
 /**
- * @file DecompressorTable.c
+ * @file LZ78DecompressorTable.c
  * @author Cosimo Sacco <cosimosacco@gmail.com>
  * @author Davide Silvestri <davidesil.web@gmail.com>
  *
@@ -19,25 +19,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#include "DecompressorTable.h"
+#include "LZ78DecompressorTable.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-void tableDestroy(struct Node* table)
+void tableDestroy(struct LZ78DecompressorTableEntry* table)
 {
     if(table == NULL) return;
     int i = MAX_CHILD - 1;
     for(; i--;) free(table[i].word);
-    memset(table, 0, sizeof(struct Node)*MAX_CHILD);
+    memset(table, 0, sizeof(struct LZ78DecompressorTableEntry)*MAX_CHILD);
     free(table);
 }
 
-struct Node* tableCreate()
+struct LZ78DecompressorTableEntry* tableCreate()
 {
-    struct Node* table = calloc(MAX_CHILD, sizeof(struct Node));
+    struct LZ78DecompressorTableEntry* table = calloc(MAX_CHILD, sizeof(struct LZ78DecompressorTableEntry));
     int i = 1;
-    struct Node* current;
+    struct LZ78DecompressorTableEntry* current;
     if(table != NULL)
     {
         for(; i < 257; i++)
@@ -58,10 +58,10 @@ struct Node* tableCreate()
     return table;
 }
 
-inline void tableReset(struct Node* table)
+inline void tableReset(struct LZ78DecompressorTableEntry* table)
 {
     table = table + 257;
     int i = MAX_CHILD - 257;
     for(; i--;) free(table[i].word);
-    memset(table, 0, sizeof(struct Node)*(MAX_CHILD - 257));
+    memset(table, 0, sizeof(struct LZ78DecompressorTableEntry)*(MAX_CHILD - 257));
 }

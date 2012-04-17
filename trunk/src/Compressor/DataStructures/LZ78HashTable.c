@@ -317,10 +317,8 @@ INDEX_TYPE hashLookup
             )
         )
     )
-    {
         index = (index+1)%HASH_TABLE_ENTRIES; //TODO è il modo più efficiente? ATTENZIONE
-    }
-    return (table[index].childIndex)? table[index].childIndex : ROOT_INDEX;
+    return table[index].childIndex;
 }
 
 struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int* collision)

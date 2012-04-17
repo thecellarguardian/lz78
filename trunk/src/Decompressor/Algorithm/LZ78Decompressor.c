@@ -21,7 +21,7 @@
 
 #include "LZ78Decompressor.h"
 #include "../../Configuration/LZ78CompressorConfiguration.h"
-#include "../DataStructures/DecompressorTable.h"
+#include "../DataStructures/LZ78DecompressorTable.h"
 #include "../../../lib/BitwiseBufferedFile/BitwiseBufferedFile.h"
 #include <fcntl.h>
 #include <stdint.h>
@@ -38,9 +38,9 @@ int decompress(FILE* inputFile, FILE* outputFile)
     INDEX_TYPE currentIndex = 0;
     INDEX_TYPE length = 0;
     uint8_t* result;
-    struct Node* table;
-    struct Node* current;
-    struct Node* lastChild;
+    struct LZ78DecompressorTableEntry* table;
+    struct LZ78DecompressorTableEntry* current;
+    struct LZ78DecompressorTableEntry* lastChild;
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
