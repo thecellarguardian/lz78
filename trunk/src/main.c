@@ -14,20 +14,18 @@
 #define DEFAULT_COMPRESSION_LEVEL 3
 #define MAX_COMPRESSION_LEVEL 5
 
+const char* license =
+"lz78 rev 132\n\
+Copyright (C) 2012 Cosimo Sacco and Davide Silvestri.\n\
+This is free software.\n\
+You may redistribute copies of it under the terms of\n\
+the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n\
+There is NO WARRANTY, to the extent permitted by law.\n";
+
 void help()
 {
-}
 
-void license()
-{
-    printf
-    (
-        "Copyright (C) 2012 Cosimo Sacco and Davide Silvestri.\n\
-        This is free software.\n\
-        You may redistribute copies of it under the terms of\n\
-        the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n\
-        There is NO WARRANTY, to the extent permitted by law.\n"
-    );
+
 }
 
 static int fastFlag = 0;
@@ -80,7 +78,7 @@ int main(int argc, char** argv)
                 compressionLevel = (5 + optionToProcess)%5;
                 break;
             case 'h': help(); return 0;
-            case 'L': license(); return 0;
+            case 'L': printf(license); return 0;
             case 'l':
                 compressionLevel = atoi(optarg);
                 if
