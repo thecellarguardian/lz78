@@ -105,7 +105,7 @@ const HASH_INDEX sBox[] =
 inline HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //S-BOX hash function
 {
     int i = 0;
-    HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
+    HASH_INDEX key = (((HASH_INDEX)key1) << 8) | ((HASH_INDEX)key2);
     HASH_INDEX index = 0;
     uint8_t* keyArray = ((uint8_t*)&key);
     for(; i < sizeof(HASH_INDEX); i++)
@@ -114,7 +114,7 @@ inline HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //S-BOX hash fu
     }
     return index%(HASH_TABLE_ENTRIES);
 }
-
+/*
 const uint8_t permutationTable[256] =
 {
       0,  98, 207, 203, 230,  76, 194,  50, 136, 126, 142, 202,  24,  58, 253,
@@ -210,7 +210,7 @@ HASH_INDEX JSWhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //JSW hash function
     free(tab);
     return index;
 }
-
+*/
 int hashInsert
 (
     struct LZ78HashTableEntry* table,
