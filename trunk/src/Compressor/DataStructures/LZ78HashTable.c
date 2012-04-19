@@ -29,7 +29,7 @@ struct LZ78HashTableEntry
 {
     //key:
     INDEX_TYPE fatherIndex;
-    uint8_t childValue;
+    INDEX_TYPE childValue; //Only one byte is used
     //value:
     INDEX_TYPE childIndex;
 };
@@ -215,14 +215,14 @@ int hashInsert
 (
     struct LZ78HashTableEntry* table,
     INDEX_TYPE fatherIndex,
-    uint8_t* childValue,
+    INDEX_TYPE childValue,
     INDEX_TYPE childIndex,
     int* collision
 )
 {
     if(table == NULL) return -1;
     struct LZ78HashTableEntry* current;
-    HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)(*childValue)));
+    HASH_INDEX index = hashFunction(fatherIndex, childValue);
     //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     if(table[index].childIndex) (*collision)++;//PER TESTING!!!
     while(table[index].childIndex) //collision, find first empty. Slow but it's done only in case of collision
@@ -233,7 +233,7 @@ int hashInsert
     current = &(table[index]);
     current->childIndex = childIndex;
     current->fatherIndex = fatherIndex;
-    current->childValue = *childValue;
+    current->childValue = childValue;
     return 0;
 }
 
@@ -241,20 +241,20 @@ inline INDEX_TYPE hashLookup
 (
     struct LZ78HashTableEntry* table,
     INDEX_TYPE fatherIndex,
-    uint8_t* childValue,
+    INDEX_TYPE childValue,
     int* collision
 )
 {
     if(table == NULL) return -1;
-    HASH_INDEX index = hashFunction(fatherIndex, ((INDEX_TYPE)(*childValue)));
+    HASH_INDEX index = hashFunction(fatherIndex, childValue);
     //HASH_INDEX i = 0;
-    if((table[index].childIndex) && (table[index].childValue  != *childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
+    if((table[index].childIndex) && (table[index].childValue  != childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
     while //slow but it's done only in case of collision
     (
         (
             (table[index].childIndex) &&
             (
-                table[index].childValue  != *childValue
+                table[index].childValue  != childValue
                 ||
                 table[index].fatherIndex != fatherIndex
             )
@@ -266,21 +266,22 @@ inline INDEX_TYPE hashLookup
 struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry* table, int* collision)
 {
     int i = 0;
-    uint8_t currentValue = 0;
+    INDEX_TYPE currentValue = 0;
     if(table != NULL)
     {
         memset(table, 0, HASH_TABLE_LENGTH);
         for(; i < 256; i++)
         {
-            currentValue = (uint8_t)i;  //ascii value - 1 equals to index value
+            currentValue = i;  //ascii value - 1 equals to index value
             if
             (
                 hashInsert
                 (
                     table,
                     ROOT_INDEX,
-                    &currentValue,
-                    ((INDEX_TYPE)(((INDEX_TYPE)currentValue) + ((INDEX_TYPE)1))), collision
+                    currentValue,
+                    currentValue + 1,
+                    collision
                 ) == -1
             ) goto exceptionHandler;
             //printf("%u\n", table[0].childIndex);

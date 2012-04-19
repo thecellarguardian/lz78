@@ -27,9 +27,9 @@ struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry*, int*);
 
 struct LZ78HashTableEntry* hashCreate(int*);
 
-INDEX_TYPE hashLookup(struct LZ78HashTableEntry*, INDEX_TYPE, uint8_t*, int*);
+INDEX_TYPE hashLookup(struct LZ78HashTableEntry*, INDEX_TYPE, INDEX_TYPE, int*);
 
-int hashInsert(struct LZ78HashTableEntry*, INDEX_TYPE, uint8_t*, INDEX_TYPE, int*);
+int hashInsert(struct LZ78HashTableEntry*, INDEX_TYPE, INDEX_TYPE, INDEX_TYPE, int*);
 
 struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry*, int*);
 

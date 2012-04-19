@@ -65,7 +65,7 @@ int compress(FILE* inputFile, FILE* outputFile)
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++) //TODO siamo sicuri che è + efficiente che richiamare la fread ogni volta??
         {
            // printf("\nCerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
-            child = hashLookup(hashTable, lookupIndex, &(readByte[byteIndex]), &collision);
+            child = hashLookup(hashTable, lookupIndex, readByte[byteIndex], &collision);
             if(child != ROOT_INDEX) //ROOT_INDEX means NOT FOUND
             {
                 lookupIndex = child;
@@ -82,12 +82,12 @@ int compress(FILE* inputFile, FILE* outputFile)
                     (
                         hashTable,
                         lookupIndex,
-                        &readByte[byteIndex],
+                        readByte[byteIndex],
                         childIndex, &collision
                     ) == -1
                 ) goto exceptionHandler;
-              //  printf("ho scritto: %i\n", lookupIndex);
-        //printf("Ho inserito %s nel figlio: %i\n",&readByte[byteIndex], childIndex);
+                //  printf("ho scritto: %i\n", lookupIndex);
+                //printf("Ho inserito %s nel figlio: %i\n",&readByte[byteIndex], childIndex);
                 childIndex++;
                 if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
@@ -102,7 +102,7 @@ int compress(FILE* inputFile, FILE* outputFile)
                 if (childIndex == MAX_CHILD) //hash table is full
                 {
                     if(hashReset(hashTable,&collision) == NULL)
-            goto exceptionHandler; //hash table was not successfully created
+                    goto exceptionHandler; //hash table was not successfully created
                     childIndex = 257; //starts from the beginning
                 }
             }
