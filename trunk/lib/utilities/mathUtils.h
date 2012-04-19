@@ -18,5 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
+#ifndef MATH_UTILS_H
+#define MATH_UTILS_H
+
 inline int min(int a, int b){return ((a < b)? a : b);}
 inline int max(int a, int b){return ((a > b)? a : b);}
+
+#endif

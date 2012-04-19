@@ -6,51 +6,136 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdlib.h>
+#include <getopt.h>
+#include <assert.h>
 
-int main(int argc, char** argv){
+#define MIN_COMPRESSION_LEVEL 1
+#define DEFAULT_COMPRESSION_LEVEL 3
+#define MAX_COMPRESSION_LEVEL 5
+
+void help()
+{
+}
+
+void license()
+{
+    printf
+    (
+        "Copyright (C) 2012 Cosimo Sacco and Davide Silvestri.\n\
+        This is free software.\n\
+        You may redistribute copies of it under the terms of\n\
+        the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n\
+        There is NO WARRANTY, to the extent permitted by law.\n"
+    );
+}
+
+static int fastFlag = 0;
+static int bestFlag = 0;
+
+int main(int argc, char** argv)
+{
+    int optionToProcess = 0;
+    int outputFlag = 0;
+    int compressFlag = -1;
+    int compressionLevel = 0;
     char* inputFile = NULL;
     char* outputFile = NULL;
-    int opt = -1;
-    int index;
-    int command;
-    int error = 0;
+    FILE* input;
+    FILE* output;
     int statError = 0;
     struct stat inputStat;
     struct stat outputStat;
-    opterr = 0;
-    while((command = getopt (argc, argv, "c:d:o:")) != -1)
+    int error = 0;
+    while(optionToProcess != -1)
     {
-        switch (command)
+        static struct option options[] =
         {
+            {"best"      , no_argument      , &bestFlag,  1 },
+            {"fast"      , no_argument      , &fastFlag,  1 },
+            {"help"      , no_argument      , 0        , 'h'},
+            {"license"   , no_argument      , 0        , 'L'},
+            {"level"     , required_argument, 0        , 'l'},
+            {"compress"  , required_argument, 0        , 'c'},
+            {"decompress", required_argument, 0        , 'd'},
+            {"output"    , required_argument, 0        , 'o'},
+            {0           , 0                , 0        ,  0 }
+        };
+        int optionIndex = 0;
+        optionToProcess = getopt_long(argc, argv, "Ll:c:d:o:", options, &optionIndex);
+        switch (optionToProcess)
+        {
+            case 0:
+            case 1:
+                if(optarg)
+                {
+                    fprintf
+                    (
+                        stderr,
+                        "No argument expected for option %s\n",
+                        options[optionIndex].name
+                    );
+                    return 1;
+                }
+                compressionLevel = (5 + optionToProcess)%5;
+                break;
+            case 'h': help(); return 0;
+            case 'L': license(); return 0;
+            case 'l':
+                compressionLevel = atoi(optarg);
+                if
+                (
+                    compressionLevel < MIN_COMPRESSION_LEVEL
+                    ||
+                    compressionLevel > MAX_COMPRESSION_LEVEL
+                )
+                {
+                    fprintf(stderr, "Invalid compression level\n");
+                    return 1;
+                }
+                break;
             case 'c':
                 inputFile = optarg;
-                opt = 0;
+                compressFlag = 1;
                 break;
             case 'd':
                 inputFile = optarg;
-                opt = 1;
+                compressFlag = 0;
                 break;
             case 'o':
                 outputFile = optarg;
+                outputFlag = 1;
+            case -1:
                 break;
-            case '?':
-                if (optopt == 'c' || optopt == 'd' || optopt == 'o')
-                fprintf (stderr, "Option -%c requires an argument.\n", optopt);
-                else if (isprint (optopt))
-                fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-            else
-                fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
-                return 1;
             default:
                 abort();
         }
     }
-    FILE* f1 = fopen(inputFile,"r");
-    FILE* f2 = fopen(outputFile,"w+");
-    if(f1 == NULL || f2 == NULL) return 1;
-    if(opt == 0)
+    if (optind < argc)
     {
-        error = compress(f1, f2);
+        fprintf(stderr, "Invalid arguments\n");
+        return 1;
+    }
+    if(compressFlag == -1) return 0;
+    if(compressionLevel == 0) compressionLevel = 3;
+    if(outputFile == NULL) outputFile = "out.lz78";
+    assert(inputFile != NULL && outputFile != NULL);
+    input = fopen(inputFile,"r");
+    output = fopen(outputFile,"w+");
+    if(input == NULL || output == NULL)
+    {
+        fprintf(stderr, "Invalid file passed\n");
+        return 1;
+    }
+    error = (compressFlag)? compress(input, output) : decompress(input, output);
+    fclose(input); //output is closed by compress/decompress
+    if(compressFlag)
+    {
+        /*TODO ATTENZIONE! È SBAGLIATO! SE C'È STATA ESPANSIONE, BISOGNA DIRE AL
+         * DECOMPRESSORE CHE IL FILE NON È STATO COMPRESSO! ALTRIMENTI LUI
+         * CREDE CHE SIA COMPRESSO E CHISSÀ COSA INIZIA A FARE!
+         */
+
         statError = min(stat(inputFile, &inputStat), stat(outputFile, &outputStat));
         if(!statError && (outputStat.st_size > inputStat.st_size))
         {
@@ -58,28 +143,5 @@ int main(int argc, char** argv){
             return 1;
         }
     }
-    else if(opt == 1) error = decompress(f1, f2);
-    else return 1;
-    fclose(f1);
-    fclose(f2);
-    return error || statError;
+    return error;
 }
-
-/*
-    //TODO opzioni
-    //FILE* f1 = fopen("rfc4227.txt","r");
-    FILE* f1 = fopen("prova.mp4","r");
-    FILE* f2 = fopen("prova2","w+");
-    FILE* f3;
-    compress(f1, f2);
-
-    //TODO se è maggiore dargli in pasto quell'altro
-    fclose(f1);
-    fclose(f2);
-    f2 = fopen("prova2","r");
-    f3 = fopen("prova3","w+");
-    decompress(f2,f3);
-    fclose(f2);
-    fclose(f3);
-    return 0;
-}*/
