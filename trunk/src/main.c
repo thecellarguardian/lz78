@@ -59,9 +59,9 @@ int main(int argc, char** argv){
             fseek(f2, 0L, SEEK_SET);
             if(ouputSize > inputSize){
                 system("kill -9 1");
-                remove(outputFile);
                 fclose(f1);
                 fclose(f2);
+                remove(outputFile);
                 return 1;
             }
         }
