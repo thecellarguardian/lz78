@@ -21,4 +21,4 @@
 
 #include <stdio.h>
 
-int decompress(FILE* inputFile, FILE* outputFile);
+int decompress(FILE* inputFile, FILE* outputFile, int compressionLevel);

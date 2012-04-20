@@ -25,7 +25,7 @@
 #include "../../../lib/BitwiseBufferedFile/BitwiseBufferedFile.h"
 #include <errno.h>
 
-int compress(FILE* inputFile, FILE* outputFile)
+int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
 {
     struct BitwiseBufferedFile* w = openBitwiseBufferedFile(NULL, 1, -1, outputFile);
     uint8_t readByte[LOCAL_BYTE_BUFFER_LENGTH];

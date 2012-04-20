@@ -75,7 +75,7 @@ int main(int argc, char** argv)
                     );
                     return 1;
                 }
-                compressionLevel = (5 + optionToProcess)%5;
+                compressionLevel = (optionToProcess == 1) ? 1 : 5;
                 break;
             case 'h': help(); return 0;
             case 'L': printf(license); return 0;
@@ -125,8 +125,9 @@ int main(int argc, char** argv)
         fprintf(stderr, "Invalid file passed\n");
         return 1;
     }
-    error = (compressFlag)? compress(input, output) : decompress(input, output);
-    fclose(input); //output is closed by compress/decompress
+    error = (compressFlag)? compress(input, output, compressionLevel) : decompress(input, output, compressionLevel);
+    fclose(input);
+    fclose(output);
     if(compressFlag)
     {
         /*TODO ATTENZIONE! È SBAGLIATO! SE C'È STATA ESPANSIONE, BISOGNA DIRE AL

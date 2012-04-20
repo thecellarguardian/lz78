@@ -29,7 +29,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-int decompress(FILE* inputFile, FILE* outputFile)
+int decompress(FILE* inputFile, FILE* outputFile, int compressionLevel)
 {
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, O_RDONLY, -1, inputFile);
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
