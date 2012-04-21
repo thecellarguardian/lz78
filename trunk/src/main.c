@@ -41,7 +41,6 @@ int main(int argc, char** argv)
     char* outputFile = NULL;
     FILE* input;
     FILE* output;
-    int statError = 0;
     struct stat inputStat;
     struct stat outputStat;
     int error = 0;
@@ -135,10 +134,9 @@ int main(int argc, char** argv)
          * CREDE CHE SIA COMPRESSO E CHISSÀ COSA INIZIA A FARE!
          */
 
-        statError = min(stat(inputFile, &inputStat), stat(outputFile, &outputStat));
-        if(!statError && (outputStat.st_size > inputStat.st_size))
+        if(!(stat(inputFile, &inputStat) || stat(outputFile, &outputStat)) && (outputStat.st_size > inputStat.st_size))
         {
-            remove(outputFile);
+            //TODO remove(outputFile);
             return 1;
         }
     }

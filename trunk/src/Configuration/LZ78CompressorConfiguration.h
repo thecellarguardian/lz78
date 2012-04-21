@@ -23,16 +23,16 @@
 #define INITIAL_INDEX_LENGTH 9 //log_2(ROOT_INDEX)
 //#define FINAL_INDEX_LENGTH 24 //era 16 log_2(MAX_CHILD+1), provato a 20
 #define INDEX_LENGTH_MASK 511 //111111111 (INITIAL_INDEX_LENGTH ones)
-//#define MAX_CHILD 16777215//era 65535, provato a 1048575 CONF
+#define MAX_CHILD 16777215//era 65535, provato a 1048575 CONF
 #define LOCAL_BYTE_BUFFER_LENGTH 128 //era 64
 #define LZ78_INTERPRETER "#!/usr/bin/env lz78"
 #define INDEX_TYPE uint32_t //era uint16_t, provato a 32
 #define CELL_TYPE_LENGTH 32// era 16, provato a 32
 #define HASH_INDEX uint32_t //era uint32_t, il numero di bit che serve per indicizzare 2*MAX_CHILD, provato a 64
-//#define HASH_TABLE_LENGTH (33554432)*sizeof(struct LZ78HashTableEntry) //CONF
-//#define HASH_TABLE_ENTRIES (33554432) //CONF
+#define HASH_TABLE_LENGTH (33554432)*sizeof(struct LZ78HashTableEntry) //CONF
+#define HASH_TABLE_ENTRIES (33554432) //CONF
 
-static int compressionLevelMatrix [5][2] =
+/*static int compressionLevelMatrix [5][2] =
     {
         {2097151, 2097152, (2097152)*sizeof(struct LZ78HashTableEntry)},
         {2097151, 4194304, (4194304)*sizeof(struct LZ78HashTableEntry)},
@@ -40,4 +40,4 @@ static int compressionLevelMatrix [5][2] =
         {8388607, 16777216, (16777216)*sizeof(struct LZ78HashTableEntry)},
         {16777215, 33554432, (33554432)*sizeof(struct LZ78HashTableEntry)}
     };
-
+*/ //CONF
