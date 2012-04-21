@@ -34,7 +34,7 @@
 
 static int compressionLevelMatrix [5][2] =
     {
-        {1048576, 2097152, (2097152)*sizeof(struct LZ78HashTableEntry)},
+        {2097151, 2097152, (2097152)*sizeof(struct LZ78HashTableEntry)},
         {2097151, 4194304, (4194304)*sizeof(struct LZ78HashTableEntry)},
         {4194303, 8388608, (8388608)*sizeof(struct LZ78HashTableEntry)},
         {8388607, 16777216, (16777216)*sizeof(struct LZ78HashTableEntry)},
