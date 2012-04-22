@@ -22,11 +22,19 @@ You may redistribute copies of it under the terms of\n\
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n\
 There is NO WARRANTY, to the extent permitted by law.\n";
 
-void help()
-{
-
-
-}
+const char* help =
+"Usage: lz78 [OPTION]...\n\
+Compress or uncompress FILEs.\n\n\
+Mandatory arguments to long options are mandatory for short options too.\n\n\
+  -c, --compress    compress the specified file\n\
+  -d, --decompress  decompress the specified file\n\
+  -l, --level       set compression level\n\
+      --fast        compress faster\n\
+      --best        compress better\n\
+  -L, --license     display software license\n\
+  -h, --help        display this message\n\
+  -V, --version     display version number\n\n\
+Report bugs to <mettiamocelo@gnu.org>.\n";
 
 static int fastFlag = 0;
 static int bestFlag = 0;
@@ -76,7 +84,7 @@ int main(int argc, char** argv)
                 }
                 compressionLevel = (optionToProcess == 1) ? 1 : 5;
                 break;
-            case 'h': help(); return 0;
+            case 'h': printf(help); return 0;
             case 'L': printf(license); return 0;
             case 'l':
                 compressionLevel = atoi(optarg);
@@ -114,7 +122,7 @@ int main(int argc, char** argv)
         return 1;
     }
     if(compressFlag == -1) return 0;
-    if(compressionLevel == 0) compressionLevel = 3;
+    if(compressionLevel == 0) compressionLevel = DEFAULT_COMPRESSION_LEVEL;
     if(outputFile == NULL) outputFile = "out.lz78";
     assert(inputFile != NULL && outputFile != NULL);
     input = fopen(inputFile,"r");
@@ -124,19 +132,27 @@ int main(int argc, char** argv)
         fprintf(stderr, "Invalid file passed\n");
         return 1;
     }
-    error = (compressFlag)? compress(input, output, compressionLevel) : decompress(input, output, compressionLevel);
+    error =
+        (compressFlag)?
+        compress(input, output, compressionLevel)
+        :
+        decompress(input, output, compressionLevel);
     fclose(input);
     fclose(output);
     if(compressFlag)
     {
-        /*TODO ATTENZIONE! È SBAGLIATO! SE C'È STATA ESPANSIONE, BISOGNA DIRE AL
-         * DECOMPRESSORE CHE IL FILE NON È STATO COMPRESSO! ALTRIMENTI LUI
-         * CREDE CHE SIA COMPRESSO E CHISSÀ COSA INIZIA A FARE!
-         */
-
-        if(!(stat(inputFile, &inputStat) || stat(outputFile, &outputStat)) && (outputStat.st_size > inputStat.st_size))
+        if
+        (
+            !(
+                stat(inputFile, &inputStat)
+                ||
+                stat(outputFile, &outputStat)
+            )
+            &&
+            (outputStat.st_size > inputStat.st_size)
+        )
         {
-            //TODO remove(outputFile);
+            remove(outputFile);
             return 1;
         }
     }

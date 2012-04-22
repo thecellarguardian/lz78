@@ -259,7 +259,7 @@ inline INDEX_TYPE hashLookup
                 table[index].fatherIndex != fatherIndex
             )
         )
-    ) index = (index+1)%HASH_TABLE_ENTRIES; //TODO è il modo più efficiente? ATTENZIONE
+    ) index = (index+1)%HASH_TABLE_ENTRIES; //HASH_TABLE_ENTRIES is a power of two
     return table[index].childIndex;
 }
 

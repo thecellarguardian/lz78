@@ -102,7 +102,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                 if (childIndex == MAX_CHILD) //hash table is full
                 {
                     if(hashReset(hashTable,&collision) == NULL)
-                    goto exceptionHandler; //hash table was not successfully created
+                        goto exceptionHandler; //hash table was not successfully created
                     childIndex = 257; //starts from the beginning
                 }
             }
