@@ -41,7 +41,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     uint32_t hashTableLength = hashTableEntries*sizeof(struct LZ78HashTableEntry);
     uint32_t maxChild = getCompressionParameter(compressionLevel, MAX_CHILD);
     int collision = 0; //TESTING
-    if(!(maxChild && hashTableLength && hashTableEntries) || inputFile == NULL || w == NULL)
+    if(!(maxChild && hashTableEntries) || inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
         if(w != NULL) closeBitwiseBufferedFile(w);

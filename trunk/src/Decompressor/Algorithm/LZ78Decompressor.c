@@ -41,20 +41,20 @@ int decompress(FILE* inputFile, FILE* outputFile)
     struct LZ78DecompressorTableEntry* table;
     struct LZ78DecompressorTableEntry* current;
     struct LZ78DecompressorTableEntry* lastChild;
-    CELL_TYPE compressionLevel;
-    uint32_t maxChild;
+    CELL_TYPE compressionLevel = 0;
+    uint32_t maxChild = 0;
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
         if(r != NULL) closeBitwiseBufferedFile(r);
         return -1;
     }
-    if(((readBitBuffer(r, &compressionLevel, 3)) < 3) || (maxChild = getCompressionParameter(compressionLevel, MAX_CHILD)) || ((table = tableCreate(maxChild)) == NULL))
+    if(((readBitBuffer(r, &compressionLevel, 3)) < 3) || !(maxChild = getCompressionParameter(compressionLevel, MAX_CHILD)) || ((table = tableCreate(maxChild)) == NULL))
     {
         closeBitwiseBufferedFile(r);
         return -1;
     }
-   // printf("INIZIO DECOMPRESSIONE\n");
+    // printf("INIZIO DECOMPRESSIONE\n");
     while(!emptyFile(r))
     {
         currentIndex = 0;

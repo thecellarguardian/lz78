@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <assert.h>
+//#include <assert.h>
 
 #define MIN_COMPRESSION_LEVEL 1
 #define DEFAULT_COMPRESSION_LEVEL 3
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     if(compressFlag == -1) return 0;
     if(compressionLevel == 0) compressionLevel = DEFAULT_COMPRESSION_LEVEL;
     if(outputFile == NULL) outputFile = "out.lz78";
-    assert(inputFile != NULL && outputFile != NULL);
+    //assert(inputFile != NULL && outputFile != NULL);
     input = fopen(inputFile,"r");
     output = fopen(outputFile,"w+");
     if(input == NULL || output == NULL)
@@ -152,6 +152,9 @@ int main(int argc, char** argv)
             remove(outputFile);
             return 1;
         }
+    }
+    if(error){
+        fprintf(stderr, "Compression error\n");
     }
     return error;
 }
