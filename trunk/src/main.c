@@ -132,11 +132,7 @@ int main(int argc, char** argv)
         fprintf(stderr, "Invalid file passed\n");
         return 1;
     }
-    error =
-        (compressFlag)?
-        compress(input, output, compressionLevel)
-        :
-        decompress(input, output, compressionLevel);
+    error = (compressFlag)? compress(input, output, compressionLevel) : decompress(input, output);
     fclose(input);
     fclose(output);
     if(compressFlag)
@@ -152,6 +148,7 @@ int main(int argc, char** argv)
             (outputStat.st_size > inputStat.st_size)
         )
         {
+            fprintf(stdout, "File not compressed\n");
             remove(outputFile);
             return 1;
         }

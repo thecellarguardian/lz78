@@ -29,8 +29,8 @@ struct LZ78DecompressorTableEntry
     CELL_TYPE length; // worst case = tree levels
 };
 
-struct LZ78DecompressorTableEntry* tableCreate();
+inline struct LZ78DecompressorTableEntry* tableCreate(uint32_t maxChild);
 
-void tableReset(struct LZ78DecompressorTableEntry* table);
+inline void tableReset(struct LZ78DecompressorTableEntry* table, uint32_t maxChild);
 
-void tableDestroy(struct LZ78DecompressorTableEntry* table);
+inline void tableDestroy(struct LZ78DecompressorTableEntry* table, uint32_t maxChild);

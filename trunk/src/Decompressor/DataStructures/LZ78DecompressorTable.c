@@ -24,18 +24,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void tableDestroy(struct LZ78DecompressorTableEntry* table)
+inline void tableDestroy(struct LZ78DecompressorTableEntry* table, uint32_t maxChild)
 {
     if(table == NULL) return;
-    int i = MAX_CHILD - 1;
+    int i = maxChild - 1;
     for(; i--;) free(table[i].word);
-    memset(table, 0, sizeof(struct LZ78DecompressorTableEntry)*MAX_CHILD);
+    memset(table, 0, sizeof(struct LZ78DecompressorTableEntry)*maxChild);
     free(table);
 }
 
-struct LZ78DecompressorTableEntry* tableCreate()
+inline struct LZ78DecompressorTableEntry* tableCreate(uint32_t maxChild)
 {
-    struct LZ78DecompressorTableEntry* table = calloc(MAX_CHILD, sizeof(struct LZ78DecompressorTableEntry));
+    struct LZ78DecompressorTableEntry* table = calloc(maxChild, sizeof(struct LZ78DecompressorTableEntry));
     int i = 1;
     struct LZ78DecompressorTableEntry* current;
     if(table != NULL)
@@ -47,7 +47,7 @@ struct LZ78DecompressorTableEntry* tableCreate()
             current->word = malloc(1);
             if(current->word == NULL)
             {
-                tableDestroy(table);
+                tableDestroy(table, maxChild);
                 table = NULL;
                 break;
             }
@@ -58,7 +58,7 @@ struct LZ78DecompressorTableEntry* tableCreate()
     return table;
 }
 
-inline void tableReset(struct LZ78DecompressorTableEntry* table)
+inline void tableReset(struct LZ78DecompressorTableEntry* table, uint32_t maxChild)
 {
     table = table + 257;
     int i = MAX_CHILD - 257;

@@ -23,14 +23,23 @@
 #include "../../Configuration/LZ78CompressorConfiguration.h"
 #include "../../../lib/BitwiseBufferedFile/bufferConfiguration.h"
 
-struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry*, int*);
+struct LZ78HashTableEntry
+{
+    //key:
+    INDEX_TYPE fatherIndex;
+    INDEX_TYPE childValue; //Only one byte is used
+    //value:
+    INDEX_TYPE childIndex;
+};
 
-struct LZ78HashTableEntry* hashCreate(int*);
+struct LZ78HashTableEntry* hashInitialize(struct LZ78HashTableEntry*, uint32_t, int*);
 
-INDEX_TYPE hashLookup(struct LZ78HashTableEntry*, INDEX_TYPE, INDEX_TYPE, int*);
+inline struct LZ78HashTableEntry* hashCreate(uint32_t, int*);
 
-int hashInsert(struct LZ78HashTableEntry*, INDEX_TYPE, INDEX_TYPE, INDEX_TYPE, int*);
+inline INDEX_TYPE hashLookup(struct LZ78HashTableEntry*, INDEX_TYPE, INDEX_TYPE, uint32_t, int*);
 
-struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry*, int*);
+inline int hashInsert(struct LZ78HashTableEntry*, INDEX_TYPE, INDEX_TYPE, INDEX_TYPE, uint32_t, int*);
 
-void hashDestroy(struct LZ78HashTableEntry*);
+inline struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry*, uint32_t, int*);
+
+inline void hashDestroy(struct LZ78HashTableEntry*, uint32_t);

@@ -29,7 +29,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-int decompress(FILE* inputFile, FILE* outputFile, int compressionLevel)
+int decompress(FILE* inputFile, FILE* outputFile)
 {
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, O_RDONLY, -1, inputFile);
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
@@ -41,14 +41,15 @@ int decompress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     struct LZ78DecompressorTableEntry* table;
     struct LZ78DecompressorTableEntry* current;
     struct LZ78DecompressorTableEntry* lastChild;
+    CELL_TYPE compressionLevel;
+    uint32_t maxChild;
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
         if(r != NULL) closeBitwiseBufferedFile(r);
         return -1;
     }
-    table = tableCreate();
-    if(table == NULL)
+    if(((readBitBuffer(r, &compressionLevel, 3)) < 3) || (maxChild = getCompressionParameter(compressionLevel, MAX_CHILD)) || ((table = tableCreate(maxChild)) == NULL))
     {
         closeBitwiseBufferedFile(r);
         return -1;
@@ -108,9 +109,9 @@ int decompress(FILE* inputFile, FILE* outputFile, int compressionLevel)
             indexLengthMask = (indexLengthMask << 1) | 1;
            // printf("aumento la lunghezza dell'indice \n");
         }
-        if(childIndex == MAX_CHILD)
+        if(childIndex == maxChild)
         {
-            tableReset(table);
+            tableReset(table, maxChild);
             childIndex = 257;
            // printf("reset della tabella\n");
         }
@@ -118,11 +119,11 @@ int decompress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     //printf("\nho letto FINE FILE\n");
     //printf("FINE DECOMPRESSIONE\n");
     closeBitwiseBufferedFile(r);
-    tableDestroy(table);
+    tableDestroy(table, maxChild);
     return 0;
 
     exceptionHandler:
         closeBitwiseBufferedFile(r);
-        tableDestroy(table);
+        tableDestroy(table, maxChild);
         return -1;
 }

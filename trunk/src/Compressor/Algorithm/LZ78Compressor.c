@@ -37,14 +37,17 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     INDEX_TYPE lookupIndex = ROOT_INDEX;
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     INDEX_TYPE child;
+    uint32_t hashTableEntries = getCompressionParameter(compressionLevel, HASH_TABLE_ENTRIES);
+    uint32_t hashTableLength = hashTableEntries*sizeof(struct LZ78HashTableEntry);
+    uint32_t maxChild = getCompressionParameter(compressionLevel, MAX_CHILD);
     int collision = 0; //TESTING
-    if(inputFile == NULL || w == NULL)
+    if(!(maxChild && hashTableLength && hashTableEntries) || inputFile == NULL || w == NULL)
     {
         errno = EINVAL;
         if(w != NULL) closeBitwiseBufferedFile(w);
         return -1;
     }
-    hashTable = hashCreate(&collision);
+    hashTable = hashCreate(hashTableLength, &collision);
     if(hashTable == NULL)
     {
         closeBitwiseBufferedFile(w);
@@ -59,13 +62,14 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     ) goto exceptionHandler;
     */
     //  printf("COMPRESSORE ONLINE\n");
+    if(writeBitBuffer(w, (CELL_TYPE)compressionLevel, 3) == -1) goto exceptionHandler;
     while(!feof(inputFile) && !ferror(inputFile))
     {
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++) //TODO siamo sicuri che è + efficiente che richiamare la fread ogni volta??
         {
            // printf("\nCerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
-            child = hashLookup(hashTable, lookupIndex, readByte[byteIndex], &collision);
+            child = hashLookup(hashTable, lookupIndex, readByte[byteIndex], hashTableEntries, &collision);
             if(child != ROOT_INDEX) //ROOT_INDEX means NOT FOUND
             {
                 lookupIndex = child;
@@ -83,7 +87,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                         hashTable,
                         lookupIndex,
                         readByte[byteIndex],
-                        childIndex, &collision
+                        childIndex, hashTableEntries, &collision
                     ) == -1
                 ) goto exceptionHandler;
                 //  printf("ho scritto: %i\n", lookupIndex);
@@ -99,9 +103,9 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                 //readByte value is also the right index to start with next time
         //because you have to start from the last character recognized
                 lookupIndex = readByte[byteIndex] + 1;
-                if (childIndex == MAX_CHILD) //hash table is full
+                if (childIndex == maxChild) //hash table is full
                 {
-                    if(hashReset(hashTable,&collision) == NULL)
+                    if(hashReset(hashTable, hashTableLength, &collision) == NULL)
                         goto exceptionHandler; //hash table was not successfully created
                     childIndex = 257; //starts from the beginning
                 }
@@ -123,11 +127,11 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     // printf("ho scritto: %i\n", ROOT_INDEX);
     // printf("COMPRESSORE OFFLINE\n");
     printf("COLLSIONI: %i\n",collision);
-    hashDestroy(hashTable);
+    hashDestroy(hashTable, hashTableLength);
     return closeBitwiseBufferedFile(w);
 
     exceptionHandler:
         closeBitwiseBufferedFile(w);
-        hashDestroy(hashTable);
+        hashDestroy(hashTable, hashTableLength);
         return -1;
 }
