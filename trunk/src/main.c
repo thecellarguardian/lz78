@@ -149,11 +149,12 @@ int main(int argc, char** argv)
         )
         {
             fprintf(stdout, "File not compressed\n");
-            remove(outputFile);
+            //remove(outputFile);
             return 1;
         }
     }
-    if(error){
+    if(error)
+    {
         fprintf(stderr, "Compression error\n");
     }
     return error;

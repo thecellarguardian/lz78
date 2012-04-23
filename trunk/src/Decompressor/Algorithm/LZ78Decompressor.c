@@ -101,7 +101,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         //printf("ho creato il figlio %i\n",childIndex);
         //stava quì
         childIndex++;
-        if((childIndex & indexLengthMask) == 0) //TODO: USARE LA DIVISIONE! A power of 2 is reached
+        if((childIndex & indexLengthMask) == 0)//A power of two is reached
         {
             //The length of the transmitted index is incremented
             indexLength++;

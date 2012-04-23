@@ -34,6 +34,7 @@
 //#define HASH_TABLE_ENTRIES (33554432) //CONF
 #define MAX_CHILD 0
 #define HASH_TABLE_ENTRIES 1
+#define HASH_TABLE_ENTRIES_MODULO_MASK 2
 
 /*static int compressionLevelMatrix [5][2] =
     {
