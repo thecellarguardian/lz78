@@ -62,6 +62,10 @@ inline void tableReset(struct LZ78DecompressorTableEntry* table, uint32_t maxChi
 {
     table = table + 257;
     int i = maxChild - 257;
-    for(; i--;) free(table[i].word);
-    //memset(table, 0, sizeof(struct LZ78DecompressorTableEntry)*(MAX_CHILD - 257));
+    for(; i--;)
+    {
+        free(table[i].word);
+        table[i].word = NULL;
+    }
+    //memset(table, 0, sizeof(struct LZ78DecompressorTableEntry)*(maxChild - 257));
 }
