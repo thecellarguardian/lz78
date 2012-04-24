@@ -55,7 +55,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         return -1;
     }
     // printf("INIZIO DECOMPRESSIONE\n");
-    while(!emptyFile(r))
+    for(;;) //for security reasons use this -> !emptyFile(r))
     {
         currentIndex = 0;
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
@@ -90,7 +90,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         // printf("ho scritto %s\n",result);
         current = &(table[childIndex]);
         current->length = length;
-        current->word = malloc(length + 1);
+        current->word = realloc(current->word,length + 1); //TODO CHIEDERE
         if(current->word == NULL)
         {
             //printf("fallisce la malloc\n\n");
@@ -111,7 +111,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         }
         if(childIndex == maxChild)
         {
-            tableReset(table, maxChild);
+            //tableReset(table, maxChild); TODO CHIEDERE
             childIndex = 257;
            // printf("reset della tabella\n");
         }

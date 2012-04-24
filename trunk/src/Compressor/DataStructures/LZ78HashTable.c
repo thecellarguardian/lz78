@@ -112,7 +112,7 @@ inline HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2, uint32_t modulo
     {
         index ^= sBox[keyArray[i]];
     }
-    return index & moduloMask; //TODO omg!
+    return index & moduloMask;
 }
 /*
 const uint8_t permutationTable[256] =
@@ -190,24 +190,6 @@ HASH_INDEX ELFhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //ELF hash function
     index &= ~g;
     }
     index %= HASH_TABLE_ENTRIES; //TODO lento
-    return index;
-}
-
-HASH_INDEX JSWhashFunction(INDEX_TYPE key1, INDEX_TYPE key2) //JSW hash function
-{
-    HASH_INDEX* tab = malloc(256*sizeof(HASH_INDEX));
-    int j = 0;
-    for(;j<256;j++){
-    tab[j]=j;
-    }
-    HASH_INDEX index = 0;
-    HASH_INDEX key = (((HASH_INDEX)key1) << (sizeof(INDEX_TYPE)*8)) | ((HASH_INDEX)key2);
-    uint8_t* keyArray = ((uint8_t*)&key);
-    int i = 0;
-    for (; i < sizeof(HASH_INDEX) ; i++)
-        index = ( index << 1 | index >> 31 ) ^ tab[((INDEX_TYPE)(keyArray[i]))];
-    index %= HASH_TABLE_ENTRIES; //TODO lento
-    free(tab);
     return index;
 }
 */
