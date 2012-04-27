@@ -23,6 +23,9 @@
 #include <stdio.h>
 #include "bufferConfiguration.h"
 
+#ifndef BITWISE_BUFFERED_FILE
+#define BITWISE_BUFFERED_FILE
+
 /**
  * @brief BitwiseBufferedFile open function
  *
@@ -83,3 +86,5 @@ ssize_t writeBitBuffer
 );
 
 inline int emptyFile(struct BitwiseBufferedFile* bitFile);
+
+#endif

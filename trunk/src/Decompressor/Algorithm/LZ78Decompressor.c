@@ -49,24 +49,24 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if(r != NULL) closeBitwiseBufferedFile(r);
         return -1;
     }
-    if(((readBitBuffer(r, &compressionLevel, 3)) < 3) || !(maxChild = getCompressionParameter(compressionLevel, MAX_CHILD)) || ((table = tableCreate(maxChild)) == NULL))
+    if
+    (
+        readBitBuffer(r, &compressionLevel, 3) < 3
+        ||
+        !(maxChild = getCompressionParameter(compressionLevel, MAX_CHILD))
+        ||
+        (table = tableCreate(maxChild)) == NULL
+    )
     {
         closeBitwiseBufferedFile(r);
         return -1;
     }
-    // printf("INIZIO DECOMPRESSIONE\n");
-    for(;;) //for security reasons use this -> !emptyFile(r))
+    for(;;)
     {
         currentIndex = 0;
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
-        {
             goto exceptionHandler;
-        }
-        //printf("\nho letto %u\n", currentIndex);
-        if(currentIndex == ROOT_INDEX)
-        {
-            break;
-        }
+        if(currentIndex == ROOT_INDEX) break;
         current = &(table[currentIndex]);
          /**
          * The previous child has to be updated with the current leading byte,
@@ -98,8 +98,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
         }
         memcpy(current->word, result, length);
         //bcopy(result,current->word, length);
-        //printf("ho creato il figlio %i\n",childIndex);
-        //stava quì
         childIndex++;
         if((childIndex & indexLengthMask) == 0)//A power of two is reached
         {
@@ -116,8 +114,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
            // printf("reset della tabella\n");
         }
     }
-    //printf("\nho letto FINE FILE\n");
-    //printf("FINE DECOMPRESSIONE\n");
     closeBitwiseBufferedFile(r);
     tableDestroy(table, maxChild);
     return 0;

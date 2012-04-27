@@ -38,7 +38,6 @@ struct BitwiseBufferedFile
     int emptyFile;
 };
 
-/*TODO: provare con fopen, fclose, fread e fwrite! */
 struct BitwiseBufferedFile* openBitwiseBufferedFile
 (
     const char* pathToFile,
@@ -47,7 +46,6 @@ struct BitwiseBufferedFile* openBitwiseBufferedFile
     FILE* fileToSet
 )
 {
-   // printf("OPEN: %i\n", CELL_TYPE_LENGTH);
     int fileDescriptor = -1;
     struct BitwiseBufferedFile* bitFile = NULL;
     if(mode != O_RDONLY && mode != O_WRONLY)
@@ -177,7 +175,7 @@ int closeBitwiseBufferedFile(struct BitwiseBufferedFile* bitFile)
         (
             bitFile->fileDescriptor,
             bitFile->buffer,
-            index*sizeof(CELL_TYPE) + (offset/8) + (offset > 0) //se è dentro il primo byte deve comunque dare 1
+            index*sizeof(CELL_TYPE) + (offset/8) + (offset > 0)
         );
     }
     error = close(bitFile->fileDescriptor);
@@ -312,22 +310,7 @@ ssize_t writeBitBuffer
     return 0;
 }
 
-/*inline int emptyFile(struct BitwiseBufferedFile* bitFile){
-    return bitFile->emptyFile;
-}*/
-
-#if 0
-int main()
+inline int emptyFile(struct BitwiseBufferedFile* bitFile)
 {
-    struct BitwiseBufferedFile* r = openBitwiseBufferedFile("./provaRead", 0);
-    struct BitwiseBufferedFile* w = openBitwiseBufferedFile("./provaWrite", 1);
-    CELL_TYPE test;
-    while(r->emptyFile == 0)
-    {
-        writeBitBuffer(w, test, readBitBuffer(r, &test, CELL_TYPE_LENGTH));
-    }
-    closeBitwiseBufferedFile(r);
-    closeBitwiseBufferedFile(w);
-    return 0;
+    return bitFile->emptyFile;
 }
-#endif

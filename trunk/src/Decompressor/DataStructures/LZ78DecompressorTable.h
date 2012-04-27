@@ -23,6 +23,9 @@
 #include "../../../lib/BitwiseBufferedFile/bufferConfiguration.h"
 #include <stdint.h>
 
+#ifndef LZ78_DECOMPRESSOR_TABLE
+#define LZ78_DECOMPRESSOR_TABLE
+
 struct LZ78DecompressorTableEntry
 {
     uint8_t* word;
@@ -34,3 +37,5 @@ inline struct LZ78DecompressorTableEntry* tableCreate(uint32_t maxChild);
 inline void tableReset(struct LZ78DecompressorTableEntry* table, uint32_t maxChild);
 
 inline void tableDestroy(struct LZ78DecompressorTableEntry* table, uint32_t maxChild);
+
+#endif

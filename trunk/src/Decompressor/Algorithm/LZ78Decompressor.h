@@ -21,4 +21,9 @@
 
 #include <stdio.h>
 
+#ifndef LZ78_DECOMPRESSOR
+#define LZ78_DECOMPRESSOR
+
 int decompress(FILE* inputFile, FILE* outputFile);
+
+#endif

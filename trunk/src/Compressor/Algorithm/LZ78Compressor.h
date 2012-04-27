@@ -21,4 +21,9 @@
 
 #include <stdio.h>
 
+#ifndef LZ78_COMPRESSOR
+#define LZ78_COMPRESSOR
+
 int compress(FILE* inputFile, FILE* outputFile, int compressionLevel);
+
+#endif
