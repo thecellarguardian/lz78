@@ -33,6 +33,7 @@
     #define INDEX_TYPE uint32_t //era uint16_t, provato a 32
     #define CELL_TYPE_LENGTH 32// era 16, provato a 32
     #define HASH_INDEX uint32_t //era uint32_t, il numero di bit che serve per indicizzare 2*MAX_CHILD, provato a 64
+    #define HASH_INDEX_LENGTH 32
     //#define HASH_TABLE_LENGTH (33554432)*sizeof(struct LZ78HashTableEntry) //CONF
     //#define HASH_TABLE_ENTRIES (33554432) //CONF
     #define MAX_CHILD 0

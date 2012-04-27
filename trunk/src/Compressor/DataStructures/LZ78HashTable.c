@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "LZ78HashTable.h"
 #include "../../Configuration/LZ78CompressorConfiguration.h"
 
@@ -74,12 +75,27 @@ const HASH_INDEX sBox[] =
 
 inline HASH_INDEX hashFunction(INDEX_TYPE key1, INDEX_TYPE key2, uint32_t moduloMask) //S-BOX hash function
 {
-    int i;
-    HASH_INDEX index = 0;
     HASH_INDEX key = (((HASH_INDEX)key1) << 8) | ((HASH_INDEX)key2);
     uint8_t* keyArray = ((uint8_t*)&key);
-    for(i = 0; i < sizeof(HASH_INDEX); i++) index ^= sBox[keyArray[i]];
-    return index & moduloMask;
+    return
+        (
+            sBox[keyArray[0]]
+            #if HASH_INDEX_LENGTH > 8
+                ^ sBox[keyArray[1]]
+            #endif
+            #if HASH_INDEX_LENGTH > 16
+                ^ sBox[keyArray[2]]
+                ^ sBox[keyArray[3]]
+            #endif
+            #if HASH_INDEX_LENGTH > 32
+                ^ sBox[keyArray[4]]
+                ^ sBox[keyArray[5]]
+                ^ sBox[keyArray[6]]
+                ^ sBox[keyArray[7]]
+            #endif
+        )
+        &
+        moduloMask;
 }
 /*
 const uint8_t permutationTable[256] =
@@ -175,10 +191,7 @@ inline int hashInsert
     HASH_INDEX index = hashFunction(fatherIndex, childValue, moduloMask);
     //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     if(table[index].childIndex) (*collision)++;//PER TESTING!!!
-    while(table[index].childIndex) //collision, find first empty. Slow but it's done only in case of collision
-    {
-        index = (index+1) & moduloMask;
-    }
+    while(table[index].childIndex) index = (index+1) & moduloMask; //collision, find first empty. Slow but it's done only in case of collision
     //if(table[index].childIndex != ROOT_INDEX) return -1; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     current = &(table[index]);
     current->childIndex = childIndex;
