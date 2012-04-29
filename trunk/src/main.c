@@ -24,13 +24,13 @@ There is NO WARRANTY, to the extent permitted by law.\n";
 
 const char* help =
 "Usage: lz78 [OPTION]...\n\
-Compress or uncompress FILEs.\n\n\
+Compress or uncompress FILE.\n\n\
 Mandatory arguments to long options are mandatory for short options too.\n\n\
   -c, --compress    compress the specified file\n\
   -d, --decompress  decompress the specified file\n\
-  -l, --level       set compression level\n\
-      --fast        compress faster\n\
-      --best        compress better\n\
+  -l, --level       set compression level [1-5]\n\
+      --fast        compress faster [1]\n\
+      --best        compress better [5]\n\
   -L, --license     display software license\n\
   -h, --help        display this message\n\
   -V, --version     display version number\n\n\
@@ -52,22 +52,22 @@ int main(int argc, char** argv)
     struct stat inputStat;
     struct stat outputStat;
     int error = 0;
+    int optionIndex = 0;
+    static struct option options[] =
+    {
+        {"best"      , no_argument      , &bestFlag,  1 },
+        {"fast"      , no_argument      , &fastFlag,  1 },
+        {"help"      , no_argument      , 0        , 'h'},
+        {"license"   , no_argument      , 0        , 'L'},
+        {"level"     , required_argument, 0        , 'l'},
+        {"compress"  , required_argument, 0        , 'c'},
+        {"decompress", required_argument, 0        , 'd'},
+        {"output"    , required_argument, 0        , 'o'},
+        {0           , 0                , 0        ,  0 }
+    };
     while(optionToProcess != -1)
     {
-        static struct option options[] =
-        {
-            {"best"      , no_argument      , &bestFlag,  1 },
-            {"fast"      , no_argument      , &fastFlag,  1 },
-            {"help"      , no_argument      , 0        , 'h'},
-            {"license"   , no_argument      , 0        , 'L'},
-            {"level"     , required_argument, 0        , 'l'},
-            {"compress"  , required_argument, 0        , 'c'},
-            {"decompress", required_argument, 0        , 'd'},
-            {"output"    , required_argument, 0        , 'o'},
-            {0           , 0                , 0        ,  0 }
-        };
-        int optionIndex = 0;
-        optionToProcess = getopt_long(argc, argv, "Ll:c:d:o:", options, &optionIndex);
+        optionToProcess = getopt_long(argc, argv, "hLl:c:d:o:", options, &optionIndex);
         switch (optionToProcess)
         {
             case 0:
@@ -84,8 +84,8 @@ int main(int argc, char** argv)
                 }
                 compressionLevel = (optionToProcess == 1) ? 1 : 5;
                 break;
-            case 'h': printf(help); return 0;
-            case 'L': printf(license); return 0;
+            case 'h': printf(help); return 0; break;
+            case 'L': printf(license); return 0; break;
             case 'l':
                 compressionLevel = atoi(optarg);
                 if
@@ -114,6 +114,7 @@ int main(int argc, char** argv)
                 break;
             default:
                 abort();
+                break;
         }
     }
     if (optind < argc)
@@ -132,7 +133,11 @@ int main(int argc, char** argv)
         fprintf(stderr, "Invalid file passed\n");
         return 1;
     }
-    error = (compressFlag)? compress(input, output, compressionLevel) : decompress(input, output);
+    error =
+        (compressFlag)?
+        compress(input, output, compressionLevel)
+        :
+        decompress(input, output);
     fclose(input);
     fclose(output);
     if(compressFlag)
