@@ -223,7 +223,7 @@ inline INDEX_TYPE hashLookup
                 table[index].fatherIndex != fatherIndex
             )
         )
-    ) index = (index+1) & moduloMask; //TODO è il modo più efficiente? ATTENZIONE
+    ) index = (index+1) & moduloMask;
     return table[index].childIndex;
 }
 

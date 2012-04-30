@@ -72,12 +72,11 @@ int decompress(FILE* inputFile, FILE* outputFile)
          * The previous child has to be updated with the current leading byte,
          * but not the first time (in that case, no previous child exists).
          **/
-        if(childIndex > 257)
+        if(childIndex > 257) //257 is the first child index, not to be updated
         {
             lastChild = &(table[childIndex - 1]);
             lastChild->word[lastChild->length] = current->word[0];
             lastChild->length++;
-           // printf("aggiorno con %u il figlio %i\n",current->word[0],childIndex-1);
         }
         result = current->word;
         length = current->length;
@@ -87,31 +86,22 @@ int decompress(FILE* inputFile, FILE* outputFile)
             errno = EBADFD;
             goto exceptionHandler;
         }
-        // printf("ho scritto %s\n",result);
         current = &(table[childIndex]);
         current->length = length;
-        current->word = realloc(current->word,length + 1); //TODO CHIEDERE
-        if(current->word == NULL)
-        {
-            //printf("fallisce la malloc\n\n");
-            goto exceptionHandler;
-        }
+        current->word = realloc(current->word, length + 1); //TODO CHIEDERE
+        if(current->word == NULL) goto exceptionHandler;
         memcpy(current->word, result, length);
         //bcopy(result,current->word, length);
         childIndex++;
         if((childIndex & indexLengthMask) == 0)//A power of two is reached
         {
-            //The length of the transmitted index is incremented
-            indexLength++;
-            //The next power of 2 mask is set
-            indexLengthMask = (indexLengthMask << 1) | 1;
-           // printf("aumento la lunghezza dell'indice \n");
+            indexLength++; //The length of the transmitted index is incremented
+            indexLengthMask = (indexLengthMask << 1) | 1; //Next power of 2 set
         }
         if(childIndex == maxChild)
         {
-            //tableReset(table, maxChild); TODO CHIEDERE
+            //tableReset(table, maxChild);
             childIndex = 257;
-           // printf("reset della tabella\n");
         }
     }
     closeBitwiseBufferedFile(r);

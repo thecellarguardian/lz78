@@ -68,7 +68,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     while(!feof(inputFile) && !ferror(inputFile))
     {
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
-        for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++) //TODO siamo sicuri che è + efficiente che richiamare la fread ogni volta??
+        for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
            // printf("\nCerco: %u a partire da %i\n",readByte[byteIndex],lookupIndex);
             child = hashLookup(hashTable, lookupIndex, readByte[byteIndex], moduloMask, &collision);
@@ -125,7 +125,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     (
         writeBitBuffer(w, lookupIndex, indexLength) == -1
         ||
-        writeBitBuffer(w, ROOT_INDEX, indexLength) == -1 //TODO sarebbe meglio INITIAL_INDEX_LENGTH
+        writeBitBuffer(w, ROOT_INDEX, indexLength) == -1
     ) goto exceptionHandler;
     //printf("ho scritto: %i\n", lookupIndex);
     // printf("ho scritto: %i\n", ROOT_INDEX);
