@@ -29,6 +29,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+inline void preappend(struct LZ78DecompressorTableEntry* current, struct LZ78DecompressorTableEntry* ancestor)
+{
+    free(current->word);//TODO RITORNA DA QUI
+
+}
+
 int decompress(FILE* inputFile, FILE* outputFile)
 {
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, O_RDONLY, -1, inputFile);
@@ -62,21 +68,34 @@ int decompress(FILE* inputFile, FILE* outputFile)
         return -1;
     }
     for(;;)
-    {
+    {//TODO ATTENZIONE!!!!! Ora come ora la stringa la facciamo in ogni caso, potrei, invece, farla soltanto se la utilizzo effettivamente!
         currentIndex = 0;
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
             goto exceptionHandler;
         if(currentIndex == ROOT_INDEX) break;
         current = &(table[currentIndex]);
-         /**
+        /**
          * The previous child has to be updated with the current leading byte,
          * but not the first time (in that case, no previous child exists).
          **/
         if(childIndex > 257) //257 is the first child index, not to be updated
         {
             lastChild = &(table[childIndex - 1]);
-            lastChild->word[lastChild->length] = current->word[0];
+            lastChild->word = malloc(1);
+            //lastChild->word[lastChild->length] = current->word[0];
+            lastChild->word[0] = current->word[0];
             lastChild->length++;
+        }
+        if(currentIndex > 256 && current->length == 1)
+        {
+            auxilium = current;
+            while(auxilium->length == 1 && auxilium->fatherIndex != 0)
+            {
+                current->length++;
+                preappend(current, auxilium);
+            }//index cache
+            current->length += auxilium->length;
+            preappend(current, auxilium);
         }
         result = current->word;
         length = current->length;
@@ -85,11 +104,12 @@ int decompress(FILE* inputFile, FILE* outputFile)
             errno = EBADFD;
             goto exceptionHandler;
         }
-        current = &(table[childIndex]);
-        current->length = length;
-        current->word = realloc(current->word, length + 1);
+        current = &(table[childIndex]); //Child cambia significato!
+        //current->length = 1;
+        //current->word = malloc(1);
+        current->fatherIndex = currentIndex;
         if(current->word == NULL) goto exceptionHandler;
-        memcpy(current->word, result, length); //once upon a time, bcopy
+        //memcpy(current->word, result, length); //once upon a time, bcopy
         childIndex++;
         if((childIndex & indexLengthMask) == 0)//A power of two is reached
         {
