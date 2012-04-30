@@ -82,27 +82,21 @@ int decompress(FILE* inputFile, FILE* outputFile)
         length = current->length;
         if(fwrite(result, 1, length, outputFile) != length)
         {
-            //printf("errore in scrittura\n\n");
             errno = EBADFD;
             goto exceptionHandler;
         }
         current = &(table[childIndex]);
         current->length = length;
-        current->word = realloc(current->word, length + 1); //TODO CHIEDERE
+        current->word = realloc(current->word, length + 1);
         if(current->word == NULL) goto exceptionHandler;
-        memcpy(current->word, result, length);
-        //bcopy(result,current->word, length);
+        memcpy(current->word, result, length); //once upon a time, bcopy
         childIndex++;
         if((childIndex & indexLengthMask) == 0)//A power of two is reached
         {
             indexLength++; //The length of the transmitted index is incremented
             indexLengthMask = (indexLengthMask << 1) | 1; //Next power of 2 set
         }
-        if(childIndex == maxChild)
-        {
-            //tableReset(table, maxChild);
-            childIndex = 257;
-        }
+        if(childIndex == maxChild) /*tableReset?;*/ childIndex = 257;
     }
     closeBitwiseBufferedFile(r);
     tableDestroy(table, maxChild);
