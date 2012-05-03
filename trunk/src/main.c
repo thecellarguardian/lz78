@@ -1,5 +1,6 @@
 #include "Compressor/Algorithm/LZ78Compressor.h"
 #include "Decompressor/Algorithm/LZ78Decompressor.h"
+#include "Configuration/LZ78CompressorConfiguration.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,11 +9,6 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <getopt.h>
-//#include <assert.h>
-
-#define MIN_COMPRESSION_LEVEL 1
-#define DEFAULT_COMPRESSION_LEVEL 3
-#define MAX_COMPRESSION_LEVEL 5
 
 const char* license =
 "lz78 rev 132\n\

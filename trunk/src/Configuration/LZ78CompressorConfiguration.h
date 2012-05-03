@@ -24,7 +24,8 @@
 #ifndef LZ78_COMPRESSOR_CONFIGURATION
     #define LZ78_COMPRESSOR_CONFIGURATION
     #define ROOT_INDEX 0
-    #define INITIAL_INDEX_LENGTH 9 //log_2(ROOT_INDEX)
+    #define FIRST_CHILD 257 //At the beginning there are 257 entries
+    #define INITIAL_INDEX_LENGTH 9 //ceiling(log_2(257))
     //#define FINAL_INDEX_LENGTH 24 //era 16 log_2(MAX_CHILD+1), provato a 20
     #define INDEX_LENGTH_MASK 511 //111111111 (INITIAL_INDEX_LENGTH ones)
     //#define MAX_CHILD 16777215//era 65535, provato a 1048575 CONF
@@ -39,7 +40,10 @@
     #define MAX_CHILD 0
     #define HASH_TABLE_ENTRIES 1
     #define HASH_TABLE_ENTRIES_MODULO_MASK 2
-
+    #define MIN_COMPRESSION_LEVEL 1
+    #define DEFAULT_COMPRESSION_LEVEL 3
+    #define MAX_COMPRESSION_LEVEL 5
+    #define HEADER_LENGTH 3
     /*static int compressionLevelMatrix [5][2] =
         {
             {2097151, 2097152, (2097152)*sizeof(struct LZ78HashTableEntry)},

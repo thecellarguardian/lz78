@@ -17,9 +17,9 @@ inline uint32_t getCompressionParameter(int compressionLevel, int parameter)
 {
     return
         (
-            compressionLevel > 0
+            compressionLevel >= MIN_COMPRESSION_LEVEL
             &&
-            compressionLevel < 6
+            compressionLevel <= MAX_COMPRESSION_LEVEL
             &&
             (
                 parameter == MAX_CHILD
@@ -29,7 +29,7 @@ inline uint32_t getCompressionParameter(int compressionLevel, int parameter)
                 parameter == HASH_TABLE_ENTRIES_MODULO_MASK
             )
         )?
-        compressionLevelMatrix[compressionLevel-1][parameter]
+        compressionLevelMatrix[compressionLevel - 1][parameter]
         :
         ((errno = EINVAL) && 0);
 }

@@ -40,7 +40,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     struct BitwiseBufferedFile* r = openBitwiseBufferedFile(NULL, O_RDONLY, -1, inputFile);
     INDEX_TYPE indexLengthMask = INDEX_LENGTH_MASK;
     size_t indexLength = INITIAL_INDEX_LENGTH;
-    INDEX_TYPE childIndex = 257;
+    INDEX_TYPE childIndex = FIRST_CHILD;
     INDEX_TYPE currentIndex = 0;
     INDEX_TYPE length = 0;
     uint8_t* result;
@@ -57,7 +57,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     }
     if
     (
-        readBitBuffer(r, &compressionLevel, 3) < 3
+        readBitBuffer(r, &compressionLevel, HEADER_LENGTH) < HEADER_LENGTH
         ||
         !(maxChild = getCompressionParameter(compressionLevel, MAX_CHILD))
         ||
