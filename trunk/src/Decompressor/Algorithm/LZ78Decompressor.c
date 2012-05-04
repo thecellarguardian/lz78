@@ -103,7 +103,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
                     auxilium = &(table[auxilium->fatherIndex]);
                 }//index cache
                 preappend(lastChild, auxilium);
-
                 lastChild->length++;
                 lastChild->word = realloc(lastChild->word, lastChild->length);
                 lastChild->word[lastChild->length - 1] =  lastChild->word[0];
@@ -132,18 +131,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
                 }
                 else lastChild->word[0] = current->word[0];
             }
-            //lastChild->length = 1;
         }
-        /*if(currentIndex > (FIRST_CHILD - 1) && current->length == 1) //is not one of the first 257 and its word is not complete
-        {
-            auxilium = &(table[current->fatherIndex]);
-            while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX)
-            {
-                preappend(current, auxilium);
-                auxilium = &(table[auxilium->fatherIndex]);
-            }//index cache
-            preappend(current, auxilium);
-        }*/
         result = current->word;
         length = current->length;
         if(fwrite(result, 1, length, outputFile) != length)
