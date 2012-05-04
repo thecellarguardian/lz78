@@ -89,36 +89,35 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if(childIndex > FIRST_CHILD) //257 is the first child index, not to be updated
         {
             lastChild = &(table[childIndex - 1]);
-            if (lastChild->length > 0){    //TODO provare realloc
-                free(lastChild->word);
-                lastChild->word = NULL;
+            if (lastChild->length > 0)
+            {    //TODO provare realloc
                 lastChild->length = 0;
             }
             //lastChild->word[lastChild->length] = current->word[0];
-            if(currentIndex == childIndex - 1){
-                auxilium = &(table[current->fatherIndex]);
+            if(currentIndex == childIndex - 1)
+            {
+                auxilium = &(table[lastChild->fatherIndex]);
                 while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX)
                 {
-                    preappend(current, auxilium);
+                    preappend(lastChild, auxilium);
                     auxilium = &(table[auxilium->fatherIndex]);
                 }//index cache
-                preappend(current, auxilium);
+                preappend(lastChild, auxilium);
 
-                uint8_t* app = malloc(current->length + 1);
-                memcpy(app, current->word, current->length);
-                memcpy(app + current->length, current->word, 1);
-                free(current->word);
-                current->length += 1;
-                current->word = app;
+                lastChild->length++;
+                lastChild->word = realloc(lastChild->word, lastChild->length);
+                lastChild->word[lastChild->length - 1] =  lastChild->word[0];
 
                //C'ERA PRIMA SOLO QUESTO lastChild->word[0] = (table[lastChild->fatherIndex].word[0]);
                 //printf("Ho inserito %u nel child\n",word[0]);
             }
-            else{
-                lastChild->word = malloc(1);
+            else
+            {
+                lastChild->word = realloc(lastChild->word, 1);
                 lastChild->length = 1;
                 if(lastChild->word == NULL) goto exceptionHandler;
-                if(currentIndex > (FIRST_CHILD - 1) && current->length == 1){ //is not one of the first 257 and its word is not complete
+                if(currentIndex > (FIRST_CHILD - 1) && current->length == 1)
+                { //is not one of the first 257 and its word is not complete
                     auxilium = &(table[current->fatherIndex]);
                     while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX) //TODO doppio ciclo
                     {
@@ -131,8 +130,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
                     //PRIMA C'ERA SOLO LUI ->  lastChild->word[0] = current->word[0];
                     //printf("Inserisco %c nel child %u\n",current->word[0],childIndex -1);
                 }
-                else
-                    lastChild->word[0] = current->word[0];
+                else lastChild->word[0] = current->word[0];
             }
             //lastChild->length = 1;
         }
