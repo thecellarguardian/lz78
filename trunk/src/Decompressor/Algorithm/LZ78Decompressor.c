@@ -31,14 +31,13 @@
 
 inline void preappend(struct LZ78DecompressorTableEntry* current, struct LZ78DecompressorTableEntry* ancestor)
 {
-    uint8_t* app = malloc(current->length + ancestor->length);
-    memcpy(app, ancestor->word, ancestor->length);
-    if(current->length > 0){
-        memcpy(app + ancestor->length, current->word, current->length);
-        free(current->word);
+    current->word = realloc(current->word, current->length + ancestor->length);
+    if(current->length > 0)
+    {
+        memmove(current->word + ancestor->length, current->word, current->length);
     }
+    memcpy(current->word, ancestor->word, ancestor->length);
     current->length += ancestor->length;
-    current->word = app;
 }
 
 int decompress(FILE* inputFile, FILE* outputFile)
@@ -111,7 +110,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
                 free(current->word);
                 current->length += 1;
                 current->word = app;
-               
+
                //C'ERA PRIMA SOLO QUESTO lastChild->word[0] = (table[lastChild->fatherIndex].word[0]);
                 //printf("Ho inserito %u nel child\n",word[0]);
             }
@@ -128,7 +127,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
                     }//index cache
                     preappend(current, auxilium);
                     lastChild->word[0] = auxilium->word[0];
-                    
+
                     //PRIMA C'ERA SOLO LUI ->  lastChild->word[0] = current->word[0];
                     //printf("Inserisco %c nel child %u\n",current->word[0],childIndex -1);
                 }
