@@ -33,8 +33,10 @@ inline void preappend(struct LZ78DecompressorTableEntry* current, struct LZ78Dec
 {
     uint8_t* app = malloc(current->length + ancestor->length);
     memcpy(app, ancestor->word, ancestor->length);
-    memcpy(app + ancestor->length, current->word, current->length);
-    free(current->word);
+    if(current->length > 0){
+        memcpy(app + ancestor->length, current->word, current->length);
+        free(current->word);
+    }
     current->length += ancestor->length;
     current->word = app;
 }
@@ -79,7 +81,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
             goto exceptionHandler;
         if(currentIndex == ROOT_INDEX) break;
-        printf("Ho ricevuto %u \n",currentIndex);
+        //printf("Ho ricevuto %u \n",currentIndex);
         current = &(table[currentIndex]);
         /**
          * The previous child has to be updated with the current leading byte,
@@ -88,10 +90,11 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if(childIndex > FIRST_CHILD) //257 is the first child index, not to be updated
         {
             lastChild = &(table[childIndex - 1]);
-            if (lastChild->word != NULL)    //TODO provare realloc
+            if (lastChild->length > 0){    //TODO provare realloc
                 free(lastChild->word);
-            lastChild->word = malloc(1);
-            if(lastChild->word == NULL) goto exceptionHandler;
+                lastChild->word = NULL;
+                lastChild->length = 0;
+            }
             //lastChild->word[lastChild->length] = current->word[0];
             if(currentIndex == childIndex - 1){
                 auxilium = &(table[current->fatherIndex]);
@@ -113,25 +116,28 @@ int decompress(FILE* inputFile, FILE* outputFile)
                 //printf("Ho inserito %u nel child\n",word[0]);
             }
             else{
+                lastChild->word = malloc(1);
+                lastChild->length = 1;
+                if(lastChild->word == NULL) goto exceptionHandler;
                 if(currentIndex > (FIRST_CHILD - 1) && current->length == 1){ //is not one of the first 257 and its word is not complete
                     auxilium = &(table[current->fatherIndex]);
-                    while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX)
+                    while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX) //TODO doppio ciclo
                     {
-                        //preappend(current, auxilium);
+                        preappend(current, auxilium);
                         auxilium = &(table[auxilium->fatherIndex]);
                     }//index cache
-                    //preappend(current, auxilium);
+                    preappend(current, auxilium);
                     lastChild->word[0] = auxilium->word[0];
                     
                     //PRIMA C'ERA SOLO LUI ->  lastChild->word[0] = current->word[0];
-                    printf("Inserisco %c nel child %u\n",current->word[0],childIndex -1);
+                    //printf("Inserisco %c nel child %u\n",current->word[0],childIndex -1);
                 }
                 else
                     lastChild->word[0] = current->word[0];
             }
-            lastChild->length = 1;
+            //lastChild->length = 1;
         }
-        if(currentIndex > (FIRST_CHILD - 1) && current->length == 1) //is not one of the first 257 and its word is not complete
+        /*if(currentIndex > (FIRST_CHILD - 1) && current->length == 1) //is not one of the first 257 and its word is not complete
         {
             auxilium = &(table[current->fatherIndex]);
             while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX)
@@ -140,7 +146,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
                 auxilium = &(table[auxilium->fatherIndex]);
             }//index cache
             preappend(current, auxilium);
-        }
+        }*/
         result = current->word;
         length = current->length;
         if(fwrite(result, 1, length, outputFile) != length)
@@ -148,7 +154,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             errno = EBADFD;
             goto exceptionHandler;
         }
-        printf("Ho scritto %c \n",result[0]);
+        //printf("Ho scritto %c \n",result[0]);
         current = &(table[childIndex]); //Current cambia significato!
         //current->length = 1;
         //current->word = malloc(1);

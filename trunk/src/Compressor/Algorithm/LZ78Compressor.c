@@ -70,12 +70,12 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
-            printf("\nCerco: %c a partire da %i\n",readByte[byteIndex],lookupIndex);
+            //printf("\nCerco: %c a partire da %i\n",readByte[byteIndex],lookupIndex);
             child = hashLookup(hashTable, lookupIndex, readByte[byteIndex], moduloMask, &collision);
             if(child != ROOT_INDEX) //ROOT_INDEX means NOT FOUND
             {
                 lookupIndex = child;
-                printf("Trovato qui: %i\n",lookupIndex);
+                //printf("Trovato qui: %i\n",lookupIndex);
             }
             else
             {
@@ -94,8 +94,8 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                         &collision
                     ) == -1
                 ) goto exceptionHandler;
-                  printf("ho scritto: %i\n", lookupIndex);
-                printf("Ho inserito il figlio: %i\n\n", childIndex);
+                //printf("ho scritto: %i\n", lookupIndex);
+                //printf("Ho inserito il figlio: %i\n\n", childIndex);
                 childIndex++;
                 if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
@@ -127,8 +127,8 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
         ||
         writeBitBuffer(w, ROOT_INDEX, indexLength) == -1
     ) goto exceptionHandler;
-    printf("ho scritto: %i\n", lookupIndex);
-    printf("ho scritto: %i\n", ROOT_INDEX);
+    //printf("ho scritto: %i\n", lookupIndex);
+    //printf("ho scritto: %i\n", ROOT_INDEX);
     // printf("COMPRESSORE OFFLINE\n");
     printf("COLLSIONI: %i\n",collision);
     hashDestroy(hashTable, hashTableLength);
