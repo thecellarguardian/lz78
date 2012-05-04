@@ -79,6 +79,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
             goto exceptionHandler;
         if(currentIndex == ROOT_INDEX) break;
+        printf("Ho ricevuto %u \n",currentIndex);
         current = &(table[currentIndex]);
         /**
          * The previous child has to be updated with the current leading byte,
@@ -90,15 +91,44 @@ int decompress(FILE* inputFile, FILE* outputFile)
             if (lastChild->word != NULL)    //TODO provare realloc
                 free(lastChild->word);
             lastChild->word = malloc(1);
-            word = lastChild -> word;
-            if(word == NULL) goto exceptionHandler;
+            if(lastChild->word == NULL) goto exceptionHandler;
             //lastChild->word[lastChild->length] = current->word[0];
             if(currentIndex == childIndex - 1){
-                word[0] = (table[lastChild->fatherIndex].word[0]);
+                auxilium = &(table[current->fatherIndex]);
+                while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX)
+                {
+                    preappend(current, auxilium);
+                    auxilium = &(table[auxilium->fatherIndex]);
+                }//index cache
+                preappend(current, auxilium);
+
+                uint8_t* app = malloc(current->length + 1);
+                memcpy(app, current->word, current->length);
+                memcpy(app + current->length, current->word, 1);
+                free(current->word);
+                current->length += 1;
+                current->word = app;
+               
+               //C'ERA PRIMA SOLO QUESTO lastChild->word[0] = (table[lastChild->fatherIndex].word[0]);
                 //printf("Ho inserito %u nel child\n",word[0]);
             }
-            else
-                word[0] = current->word[0];
+            else{
+                if(currentIndex > (FIRST_CHILD - 1) && current->length == 1){ //is not one of the first 257 and its word is not complete
+                    auxilium = &(table[current->fatherIndex]);
+                    while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX)
+                    {
+                        //preappend(current, auxilium);
+                        auxilium = &(table[auxilium->fatherIndex]);
+                    }//index cache
+                    //preappend(current, auxilium);
+                    lastChild->word[0] = auxilium->word[0];
+                    
+                    //PRIMA C'ERA SOLO LUI ->  lastChild->word[0] = current->word[0];
+                    printf("Inserisco %c nel child %u\n",current->word[0],childIndex -1);
+                }
+                else
+                    lastChild->word[0] = current->word[0];
+            }
             lastChild->length = 1;
         }
         if(currentIndex > (FIRST_CHILD - 1) && current->length == 1) //is not one of the first 257 and its word is not complete
@@ -118,6 +148,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             errno = EBADFD;
             goto exceptionHandler;
         }
+        printf("Ho scritto %c \n",result[0]);
         current = &(table[childIndex]); //Current cambia significato!
         //current->length = 1;
         //current->word = malloc(1);
