@@ -111,7 +111,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                 {
                     if(hashReset(hashTable, hashTableLength, moduloMask, &collision) == NULL)
                         goto exceptionHandler; //hash table was not successfully created
-                    childIndex = 257; //starts from the beginning
+                    childIndex = FIRST_CHILD; //starts from the beginning
                 }
             }
         }

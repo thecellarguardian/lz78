@@ -31,8 +31,12 @@
 
 inline void preappend(struct LZ78DecompressorTableEntry* current, struct LZ78DecompressorTableEntry* ancestor)
 {
-    free(current->word);//TODO RITORNA DA QUI
-
+    uint8_t* app = malloc(current->length + ancestor->length);
+    memcpy(app, ancestor->word, ancestor->length);
+    memcpy(app + ancestor->length, current->word, current->length);
+    free(current->word);
+    current->length += ancestor->length;
+    current->word = app;
 }
 
 int decompress(FILE* inputFile, FILE* outputFile)
@@ -46,9 +50,11 @@ int decompress(FILE* inputFile, FILE* outputFile)
     uint8_t* result;
     struct LZ78DecompressorTableEntry* table;
     struct LZ78DecompressorTableEntry* current;
+    struct LZ78DecompressorTableEntry* auxilium;
     struct LZ78DecompressorTableEntry* lastChild;
     CELL_TYPE compressionLevel = 0;
     uint32_t maxChild = 0;
+    uint8_t* word = NULL;
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
@@ -68,7 +74,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         return -1;
     }
     for(;;)
-    {//TODO ATTENZIONE!!!!! Ora come ora la stringa la facciamo in ogni caso, potrei, invece, farla soltanto se la utilizzo effettivamente!
+    {
         currentIndex = 0;
         if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
             goto exceptionHandler;
@@ -78,23 +84,31 @@ int decompress(FILE* inputFile, FILE* outputFile)
          * The previous child has to be updated with the current leading byte,
          * but not the first time (in that case, no previous child exists).
          **/
-        if(childIndex > 257) //257 is the first child index, not to be updated
+        if(childIndex > FIRST_CHILD) //257 is the first child index, not to be updated
         {
             lastChild = &(table[childIndex - 1]);
+            if (lastChild->word != NULL)    //TODO provare realloc
+                free(lastChild->word);
             lastChild->word = malloc(1);
+            word = lastChild -> word;
+            if(word == NULL) goto exceptionHandler;
             //lastChild->word[lastChild->length] = current->word[0];
-            lastChild->word[0] = current->word[0];
-            lastChild->length++;
+            if(currentIndex == childIndex - 1){
+                word[0] = (table[lastChild->fatherIndex].word[0]);
+                //printf("Ho inserito %u nel child\n",word[0]);
+            }
+            else
+                word[0] = current->word[0];
+            lastChild->length = 1;
         }
-        if(currentIndex > 256 && current->length == 1)
+        if(currentIndex > (FIRST_CHILD - 1) && current->length == 1) //is not one of the first 257 and its word is not complete
         {
-            auxilium = current;
-            while(auxilium->length == 1 && auxilium->fatherIndex != 0)
+            auxilium = &(table[current->fatherIndex]);
+            while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX)
             {
-                current->length++;
                 preappend(current, auxilium);
+                auxilium = &(table[auxilium->fatherIndex]);
             }//index cache
-            current->length += auxilium->length;
             preappend(current, auxilium);
         }
         result = current->word;
@@ -104,11 +118,11 @@ int decompress(FILE* inputFile, FILE* outputFile)
             errno = EBADFD;
             goto exceptionHandler;
         }
-        current = &(table[childIndex]); //Child cambia significato!
+        current = &(table[childIndex]); //Current cambia significato!
         //current->length = 1;
         //current->word = malloc(1);
         current->fatherIndex = currentIndex;
-        if(current->word == NULL) goto exceptionHandler;
+        //if(current->word == NULL) goto exceptionHandler;
         //memcpy(current->word, result, length); //once upon a time, bcopy
         childIndex++;
         if((childIndex & indexLengthMask) == 0)//A power of two is reached
@@ -116,7 +130,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
             indexLength++; //The length of the transmitted index is incremented
             indexLengthMask = (indexLengthMask << 1) | 1; //Next power of 2 set
         }
-        if(childIndex == maxChild) /*tableReset?;*/ childIndex = 257;
+        if(childIndex == maxChild) /*tableReset?;*/ childIndex = FIRST_CHILD;
     }
     closeBitwiseBufferedFile(r);
     tableDestroy(table, maxChild);

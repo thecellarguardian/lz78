@@ -35,12 +35,12 @@ inline void tableDestroy(struct LZ78DecompressorTableEntry* table, uint32_t maxC
 
 inline struct LZ78DecompressorTableEntry* tableCreate(uint32_t maxChild)
 {
-    struct LZ78DecompressorTableEntry* table = calloc(maxChild, sizeof(struct LZ78DecompressorTableEntry));
+    struct LZ78DecompressorTableEntry* table = calloc(maxChild, sizeof(struct LZ78DecompressorTableEntry)); //fatherIndex = 0 (== ROOT_INDEX); word = 0 (== NULL);
     int i = 1;
     struct LZ78DecompressorTableEntry* current;
     if(table != NULL)
     {
-        for(; i < 257; i++)
+        for(; i < FIRST_CHILD; i++)
         {
             current = &(table[i]);
             current->length = 1;
