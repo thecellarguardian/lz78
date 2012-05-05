@@ -29,7 +29,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-inline void preappend(struct LZ78DecompressorTableEntry* current, struct LZ78DecompressorTableEntry* ancestor)
+inline void preappend
+(
+    struct LZ78DecompressorTableEntry* current,
+    struct LZ78DecompressorTableEntry* ancestor
+)
 {
     if(current->bufferLength < (current->length + ancestor->length))
     {
@@ -93,11 +97,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         if(childIndex > FIRST_CHILD) //257 is the first child index, not to be updated
         {
             lastChild = &(table[childIndex - 1]);
-            if (lastChild->length > 0)
-            {    //TODO provare realloc
-                lastChild->length = 0;
-            }
-            //lastChild->word[lastChild->length] = current->word[0];
+            if(lastChild->length > 0) lastChild->length = 0;
             if(currentIndex == childIndex - 1)
             {
                 auxilium = &(table[lastChild->fatherIndex]);
@@ -114,7 +114,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
                     lastChild->word = realloc(lastChild->word, lastChild->bufferLength);
                 }
                 lastChild->word[lastChild->length - 1] =  lastChild->word[0];
-
                //C'ERA PRIMA SOLO QUESTO lastChild->word[0] = (table[lastChild->fatherIndex].word[0]);
                 //printf("Ho inserito %u nel child\n",word[0]);
             }
@@ -137,7 +136,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
                     }//index cache
                     preappend(current, auxilium);
                     lastChild->word[0] = auxilium->word[0];
-
                     //PRIMA C'ERA SOLO LUI ->  lastChild->word[0] = current->word[0];
                     //printf("Inserisco %c nel child %u\n",current->word[0],childIndex -1);
                 }
