@@ -31,7 +31,11 @@
 
 inline void preappend(struct LZ78DecompressorTableEntry* current, struct LZ78DecompressorTableEntry* ancestor)
 {
-    current->word = realloc(current->word, current->length + ancestor->length);
+    if(current->bufferLength < (current->length + ancestor->length))
+    {
+        current->bufferLength = current->length + ancestor->length;
+        current->word = realloc(current->word, current->bufferLength);
+    }
     if(current->length > 0)
     {
         memmove(current->word + ancestor->length, current->word, current->length);
@@ -104,7 +108,11 @@ int decompress(FILE* inputFile, FILE* outputFile)
                 }//index cache
                 preappend(lastChild, auxilium);
                 lastChild->length++;
-                lastChild->word = realloc(lastChild->word, lastChild->length);
+                if(lastChild->bufferLength < lastChild->length)
+                {
+                    lastChild->bufferLength = lastChild->length;
+                    lastChild->word = realloc(lastChild->word, lastChild->bufferLength);
+                }
                 lastChild->word[lastChild->length - 1] =  lastChild->word[0];
 
                //C'ERA PRIMA SOLO QUESTO lastChild->word[0] = (table[lastChild->fatherIndex].word[0]);
@@ -112,7 +120,11 @@ int decompress(FILE* inputFile, FILE* outputFile)
             }
             else
             {
-                lastChild->word = realloc(lastChild->word, 1);
+                if(lastChild->bufferLength == 0)
+                {
+                    lastChild->bufferLength = 1;
+                    lastChild->word = realloc(lastChild->word, 1);
+                }
                 lastChild->length = 1;
                 if(lastChild->word == NULL) goto exceptionHandler;
                 if(currentIndex > (FIRST_CHILD - 1) && current->length == 1)
