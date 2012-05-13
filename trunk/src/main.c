@@ -127,6 +127,7 @@ int main(int argc, char** argv)
             case 'o':
                 outputFile = optarg;
                 outputFlag = 1;
+                break;
             case -1:
                 break;
             default:

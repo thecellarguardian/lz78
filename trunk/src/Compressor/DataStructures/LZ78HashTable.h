@@ -39,15 +39,13 @@ struct LZ78HashTableEntry* hashInitialize
 (
     struct LZ78HashTableEntry*,
     uint32_t,
-    uint32_t,
-    int*
+    uint32_t
 );
 
 inline struct LZ78HashTableEntry* hashCreate
 (
     uint32_t,
-    uint32_t,
-    int*
+    uint32_t
 );
 
 inline INDEX_TYPE hashLookup
@@ -55,8 +53,7 @@ inline INDEX_TYPE hashLookup
     struct LZ78HashTableEntry*,
     INDEX_TYPE,
     INDEX_TYPE,
-    uint32_t,
-    int*
+    uint32_t
 );
 
 inline int hashInsert
@@ -65,16 +62,14 @@ inline int hashInsert
     INDEX_TYPE,
     INDEX_TYPE,
     INDEX_TYPE,
-    uint32_t,
-    int*
+    uint32_t
 );
 
 inline struct LZ78HashTableEntry* hashReset
 (
     struct LZ78HashTableEntry*,
     uint32_t,
-    uint32_t,
-    int*
+    uint32_t
 );
 
 inline void hashDestroy(struct LZ78HashTableEntry*, uint32_t);

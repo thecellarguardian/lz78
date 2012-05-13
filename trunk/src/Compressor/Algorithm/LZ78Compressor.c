@@ -41,7 +41,6 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     uint32_t hashTableLength = hashTableEntries*sizeof(struct LZ78HashTableEntry);
     uint32_t moduloMask = getCompressionParameter(compressionLevel, HASH_TABLE_ENTRIES_MODULO_MASK);
     uint32_t maxChild = getCompressionParameter(compressionLevel, MAX_CHILD);
-    int collision = 0; //TESTING
     if(!(maxChild && hashTableEntries && moduloMask) || inputFile == NULL || w == NULL)
     {
         printf("%u", HASH_TABLE_ENTRIES_MODULO_MASK);
@@ -49,7 +48,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
         if(w != NULL) closeBitwiseBufferedFile(w);
         return -1;
     }
-    hashTable = hashCreate(hashTableLength, moduloMask, &collision);
+    hashTable = hashCreate(hashTableLength, moduloMask);
     if(hashTable == NULL)
     {
         closeBitwiseBufferedFile(w);
@@ -71,7 +70,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
             //printf("\nCerco: %c a partire da %i\n",readByte[byteIndex],lookupIndex);
-            child = hashLookup(hashTable, lookupIndex, readByte[byteIndex], moduloMask, &collision);
+            child = hashLookup(hashTable, lookupIndex, readByte[byteIndex], moduloMask);
             if(child != ROOT_INDEX) //ROOT_INDEX means NOT FOUND
             {
                 lookupIndex = child;
@@ -90,8 +89,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                         lookupIndex,
                         readByte[byteIndex],
                         childIndex,
-                        moduloMask,
-                        &collision
+                        moduloMask
                     ) == -1
                 ) goto exceptionHandler;
                 //printf("ho scritto: %i\n", lookupIndex);
@@ -109,7 +107,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                 lookupIndex = readByte[byteIndex] + 1;
                 if (childIndex == maxChild) //hash table is full
                 {
-                    if(hashReset(hashTable, hashTableLength, moduloMask, &collision) == NULL)
+                    if(hashReset(hashTable, hashTableLength, moduloMask) == NULL)
                         goto exceptionHandler; //hash table was not successfully created
                     childIndex = FIRST_CHILD; //starts from the beginning
                     indexLength = INITIAL_INDEX_LENGTH;
@@ -132,7 +130,6 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     //printf("ho scritto: %i\n", lookupIndex);
     //printf("ho scritto: %i\n", ROOT_INDEX);
     // printf("COMPRESSORE OFFLINE\n");
-    printf("COLLSIONI: %i\n",collision);
     hashDestroy(hashTable, hashTableLength);
     return closeBitwiseBufferedFile(w);
 

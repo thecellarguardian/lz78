@@ -182,17 +182,15 @@ inline int hashInsert
     INDEX_TYPE fatherIndex,
     INDEX_TYPE childValue,
     INDEX_TYPE childIndex,
-    uint32_t moduloMask,
-    int* collision
+    uint32_t moduloMask
 )
 {
     if(table == NULL) return -1;
     struct LZ78HashTableEntry* current;
     HASH_INDEX index = hashFunction(fatherIndex, childValue, moduloMask);
     //INDEX_TYPE i = 0; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
-    if(table[index].childIndex) (*collision)++;//PER TESTING!!!
     while(table[index].childIndex) index = (index+1) & moduloMask; //collision, find first empty. Slow but it's done only in case of collision
-    //if(table[index].childIndex != ROOT_INDEX) return -1; //useless, hashInsert it's called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
+    //if(table[index].childIndex != ROOT_INDEX) return -1; //useless, hashInsert is called from the compressor at most MAX_CHILD times, then the compressor itself calls hashReset
     current = &(table[index]);
     current->childIndex = childIndex;
     current->fatherIndex = fatherIndex;
@@ -205,14 +203,12 @@ inline INDEX_TYPE hashLookup
     struct LZ78HashTableEntry* table,
     INDEX_TYPE fatherIndex,
     INDEX_TYPE childValue,
-    uint32_t moduloMask,
-    int* collision
+    uint32_t moduloMask
 )
 {
     if(table == NULL) return -1;
     HASH_INDEX index = hashFunction(fatherIndex, childValue, moduloMask);
     //HASH_INDEX i = 0;
-    if((table[index].childIndex) && (table[index].childValue  != childValue || table[index].fatherIndex != fatherIndex)) (*collision)++; //PER TESTING!!!
     while //slow but it's done only in case of collision
     (
         (
@@ -231,8 +227,7 @@ struct LZ78HashTableEntry* hashInitialize
 (
     struct LZ78HashTableEntry* table,
     uint32_t hashTableLength,
-    uint32_t moduloMask,
-    int* collision
+    uint32_t moduloMask
 )
 {
     int i = 0;
@@ -251,8 +246,7 @@ struct LZ78HashTableEntry* hashInitialize
                     ROOT_INDEX,
                     currentValue,
                     currentValue + 1,
-                    moduloMask,
-                    collision
+                    moduloMask
                 ) == -1
             ) goto exceptionHandler;
             //printf("%u\n", table[0].childIndex);
@@ -265,14 +259,14 @@ struct LZ78HashTableEntry* hashInitialize
         return NULL;
 }
 
-inline struct LZ78HashTableEntry* hashCreate(uint32_t hashTableLength, uint32_t moduloMask, int* collision)
+inline struct LZ78HashTableEntry* hashCreate(uint32_t hashTableLength, uint32_t moduloMask)
 {
-    return hashInitialize((struct LZ78HashTableEntry*)malloc(hashTableLength), hashTableLength, moduloMask, collision);
+    return hashInitialize((struct LZ78HashTableEntry*)malloc(hashTableLength), hashTableLength, moduloMask);
 }
 
-inline struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry* table, uint32_t hashTableLength, uint32_t moduloMask, int* collision)
+inline struct LZ78HashTableEntry* hashReset(struct LZ78HashTableEntry* table, uint32_t hashTableLength, uint32_t moduloMask)
 {
-    return hashInitialize(table, hashTableLength, moduloMask, collision);
+    return hashInitialize(table, hashTableLength, moduloMask);
 }
 
 inline void hashDestroy(struct LZ78HashTableEntry* table, uint32_t hashTableLength)
