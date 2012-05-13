@@ -136,12 +136,10 @@ ssize_t loadBitBuffer(int fileDescriptor, CELL_TYPE* buffer, size_t count)
     }
     readBytes = n;
     #if CELL_TYPE_LENGTH != 8
-        int offset = (n%sizeof(CELL_TYPE)); //era & ((ssize_t)(MODULO_MASK))
-        n = n/(sizeof(CELL_TYPE));// era n >>= SHIFT_FACTOR;
-        if(offset != 0) //if(n % sizeof(CELL_TYPE) != 0)
+        int offset = (n%sizeof(CELL_TYPE)); //sizeof(CELL_TYPE) is a power of 2
+        n = n/(sizeof(CELL_TYPE)); //sizeof(CELL_TYPE) is a power of 2
+        if(offset != 0)
         {
-            /*TODO gestire il caso in cui vengano letti un numero di byte non
-            congruente con la dimensione della cella*/
             n++;
             buffer[n] &= ((((CELL_TYPE)1) << offset*8) - 1);
         }
@@ -166,8 +164,8 @@ int closeBitwiseBufferedFile(struct BitwiseBufferedFile* bitFile)
     }
     if(bitFile->mode == O_WRONLY && bitFile->availableBits != 0)
     {
-        int index = bitFile->position/(sizeof(CELL_TYPE)*8); //era  >> BITWISE_SHIFT_FACTOR
-        int offset = bitFile->position%(sizeof(CELL_TYPE)*8); //era & BITWISE_MODULO_MASK
+        int index = bitFile->position/(sizeof(CELL_TYPE)*8); //sizeof(CELL_TYPE) is a power of 2
+        int offset = bitFile->position%(sizeof(CELL_TYPE)*8); //sizeof(CELL_TYPE) is a power of 2
         if(offset)
         {
             bitFile->buffer[index] &= ((CELL_TYPE)1 << offset) - 1;
@@ -235,8 +233,8 @@ ssize_t readBitBuffer
             bitFile->position = 0;
             bitFile->availableBits = err*8;
         }
-        index = (bitFile->position)/(sizeof(CELL_TYPE)*8); //era  >> BITWISE_SHIFT_FACTOR
-        offset = (bitFile->position)%(sizeof(CELL_TYPE)*8); //era & BITWISE_MODULO_MASK
+        index = (bitFile->position)/(sizeof(CELL_TYPE)*8); //sizeof(CELL_TYPE) is a power of 2
+        offset = (bitFile->position)%(sizeof(CELL_TYPE)*8); //sizeof(CELL_TYPE) is a power of 2
         bitsToBeRead =
             min
             (
@@ -255,7 +253,6 @@ ssize_t readBitBuffer
         bitFile->position += bitsToBeRead;
         readBits += bitsToBeRead;
     }
-    //printf("Dal buffer è stato letto: %u su %i", *data, readBits);
     return readBits;
 }
 
@@ -264,7 +261,6 @@ ssize_t writeBitBuffer
     struct BitwiseBufferedFile* bitFile, CELL_TYPE data, size_t length
 )
 {
-   // printf("Nel buffer è stato scritto: %i\n\n",data);
     int index;
     int offset;
     int bitsToBeWritten;
@@ -281,8 +277,8 @@ ssize_t writeBitBuffer
     }
     while(length > 0)
     {
-        index = (bitFile->position)/(sizeof(CELL_TYPE)*8); //era & BITWISE_SHIFT_FACTOR
-        offset = (bitFile->position)%(sizeof(CELL_TYPE)*8); //era & BITWISE_MODULO_MASK
+        index = (bitFile->position)/(sizeof(CELL_TYPE)*8); //sizeof(CELL_TYPE) is a power of 2
+        offset = (bitFile->position)%(sizeof(CELL_TYPE)*8); //sizeof(CELL_TYPE) is a power of 2
         bitsToBeWritten = min(CELL_TYPE_LENGTH - offset, length);
         /* The following check addresses the rotate shift problem */
         mask =

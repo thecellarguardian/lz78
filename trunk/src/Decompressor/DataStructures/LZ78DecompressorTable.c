@@ -35,7 +35,13 @@ inline void tableDestroy(struct LZ78DecompressorTableEntry* table, uint32_t maxC
 
 inline struct LZ78DecompressorTableEntry* tableCreate(uint32_t maxChild)
 {
-    struct LZ78DecompressorTableEntry* table = calloc(maxChild, sizeof(struct LZ78DecompressorTableEntry)); //fatherIndex = 0 (== ROOT_INDEX); word = 0 (== NULL);
+    struct LZ78DecompressorTableEntry* table =
+        calloc(maxChild, sizeof(struct LZ78DecompressorTableEntry));
+    /**
+     * The previous allocation automatically sets the default values:
+     * each fatherIndex becomes 0 (== ROOT_INDEX)
+     * each word becomes 0 (== NULL)
+     **/
     int i = 1;
     struct LZ78DecompressorTableEntry* current;
     if(table != NULL)
@@ -52,13 +58,13 @@ inline struct LZ78DecompressorTableEntry* tableCreate(uint32_t maxChild)
                 break;
             }
             current->word[0] = (uint8_t)i - 1;
-           // printf("riempio la posizione %i con %c\n", i, current->word[0]);
         }
     }
     return table;
 }
 
-/*inline void tableReset(struct LZ78DecompressorTableEntry* table, uint32_t maxChild) TODO CHIEDERE
+/** There's no need to reset the table
+inline void tableReset(struct LZ78DecompressorTableEntry* table, uint32_t maxChild)
 {
     table = table + 257;
     int i = maxChild - 257;
@@ -68,4 +74,5 @@ inline struct LZ78DecompressorTableEntry* tableCreate(uint32_t maxChild)
         table[i].word = NULL;
     }
     //memset(table, 0, sizeof(struct LZ78DecompressorTableEntry)*(maxChild - 257));
-}*/
+}
+**/
