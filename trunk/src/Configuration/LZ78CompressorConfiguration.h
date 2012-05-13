@@ -124,9 +124,14 @@
      * maxChild = (2^(14 + 2*c)) - 1
      * hashTableEntries = (2^(14 + 2*c + 1))
      *
-     * maxChild is the biggest unsigned integer representable on (14  2*c).
+     * maxChild is the biggest unsigned integer representable on (14 + 2*c)bits.
      * hashTableEntries is the (14 + 2*c)th power of two (so, the modulo
      * operations in most of the hash functions can be manually optimized).
+     * Both maxChild and hashTableEntries are pre-calculated and accessed
+     * through the getCompressionParameter function, which returns, for each
+     * parameter requested (through their index, MAX_CHILD, HASH_TABLE_ENTRIES,
+     * HASH_TABLE_ENTRIES_MODULO_MASK), the related value according to the
+     * desired compression level.
      **/
     #define MAX_CHILD 0
     #define HASH_TABLE_ENTRIES 1

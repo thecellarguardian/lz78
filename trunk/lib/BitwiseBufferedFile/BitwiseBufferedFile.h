@@ -43,9 +43,9 @@
  **/
 struct BitwiseBufferedFile* openBitwiseBufferedFile
 (
-    const char* pathToFile, // NULL, if you want to specify the file by file descriptor or FILE struct
+    const char* pathToFile, //NULL, if you want to specify the file by file descriptor or FILE struct
     int mode, // unmeaningful if pathToFile is NULL
-    int fileDescriptorToSet, // -1 if you want to specify the file by FILE struct
+    int fileDescriptorToSet, //-1 if you want to specify the file by FILE struct
     FILE* fileToSet
 );
 
