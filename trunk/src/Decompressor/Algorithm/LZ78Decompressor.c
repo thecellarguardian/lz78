@@ -162,7 +162,12 @@ int decompress(FILE* inputFile, FILE* outputFile)
             indexLength++; //The length of the transmitted index is incremented
             indexLengthMask = (indexLengthMask << 1) | 1; //Next power of 2 set
         }
-        if(childIndex == maxChild) /*tableReset?;*/ childIndex = FIRST_CHILD;
+        if(childIndex == maxChild)
+        {
+            /*tableReset?;*/ childIndex = FIRST_CHILD;
+            indexLength = INITIAL_INDEX_LENGTH;
+            indexLengthMask = INDEX_LENGTH_MASK;
+        }
     }
     closeBitwiseBufferedFile(r);
     tableDestroy(table, maxChild);

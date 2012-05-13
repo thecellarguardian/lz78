@@ -18,10 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
+
 /**
  * CELL_TYPE_LENGTH and BUFFER_CELLS are configurable parameters.
  * A definition may be given through an external configuration file, defining
- * EXTERNAL_BUFFER_CONFIGURATION_FILE with the right parameter.
+ * EXTERNAL_BUFFER_CONFIGURATION_FILE with the right path to it.
  * If no CELL_TYPE_LENGTH or BUFFER_CELLS definition is found, the default
  * values are used.
  * The other paramethers are automatically derived from CELL_TYPE_LENGTH.
