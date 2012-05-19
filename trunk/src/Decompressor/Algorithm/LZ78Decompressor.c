@@ -85,16 +85,19 @@ int decompress(FILE* inputFile, FILE* outputFile)
     for(;;)
     {
         currentIndex = 0;
-        if((readBitBuffer(r, &currentIndex, indexLength)) < indexLength)
-            goto exceptionHandler;
+        if
+        (
+            (readBitBuffer(r, &currentIndex, indexLength)) < indexLength
+            ||
+            currentIndex > childIndex
+        ) goto exceptionHandler;
         if(currentIndex == ROOT_INDEX) break;
-        //printf("Ho ricevuto %u \n",currentIndex);
         current = &(table[currentIndex]);
         /**
          * The previous child has to be updated with the current leading byte,
          * but not the first time (in that case, no previous child exists).
          **/
-        if(childIndex > FIRST_CHILD) //257 is the first child index, not to be updated
+        if(childIndex > FIRST_CHILD)//the first child has no previous child
         {
             lastChild = &(table[childIndex - 1]);
             if(lastChild->length > 0) lastChild->length = 0;
@@ -114,8 +117,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
                     lastChild->word = realloc(lastChild->word, lastChild->bufferLength);
                 }
                 lastChild->word[lastChild->length - 1] =  lastChild->word[0];
-               //C'ERA PRIMA SOLO QUESTO lastChild->word[0] = (table[lastChild->fatherIndex].word[0]);
-                //printf("Ho inserito %u nel child\n",word[0]);
+                //C'ERA PRIMA SOLO QUESTO lastChild->word[0] = (table[lastChild->fatherIndex].word[0]);
             }
             else
             {
@@ -137,7 +139,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
                     preappend(current, auxilium);
                     lastChild->word[0] = auxilium->word[0];
                     //PRIMA C'ERA SOLO LUI ->  lastChild->word[0] = current->word[0];
-                    //printf("Inserisco %c nel child %u\n",current->word[0],childIndex -1);
                 }
                 else lastChild->word[0] = current->word[0];
             }
@@ -149,7 +150,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
             errno = EBADFD;
             goto exceptionHandler;
         }
-        //printf("Ho scritto %c \n",result[0]);
         current = &(table[childIndex]); //Current cambia significato!
         //current->length = 1;
         //current->word = malloc(1);
@@ -164,7 +164,8 @@ int decompress(FILE* inputFile, FILE* outputFile)
         }
         if(childIndex == maxChild)
         {
-            /*tableReset?;*/ childIndex = FIRST_CHILD;
+            /* No table reset is needed :) */
+            childIndex = FIRST_CHILD;
             indexLength = INITIAL_INDEX_LENGTH;
             indexLengthMask = INDEX_LENGTH_MASK;
         }

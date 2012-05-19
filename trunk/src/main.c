@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <string.h>
 
 const char* license =
 "lz78 rev 132\n\
@@ -143,10 +144,9 @@ int main(int argc, char** argv)
     if(compressFlag == -1) return 0;
     if(compressionLevel == 0) compressionLevel = DEFAULT_COMPRESSION_LEVEL;
     if(outputFile == NULL) outputFile = "out.lz78";
-    //assert(inputFile != NULL && outputFile != NULL);
     input = fopen(inputFile,"r");
     output = fopen(outputFile,"w+");
-    if(input == NULL || output == NULL)
+    if(strcmp(inputFile, outputFile) == 0 || input == NULL || output == NULL)
     {
         fprintf(stderr, "Invalid file passed\n");
         return 1;
@@ -179,6 +179,7 @@ int main(int argc, char** argv)
     if(error)
     {
         fprintf(stderr, "Compression error\n");
+        remove(outputFile);
     }
     return error;
 }
