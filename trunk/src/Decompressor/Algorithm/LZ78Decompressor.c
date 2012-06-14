@@ -63,7 +63,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
     struct LZ78DecompressorTableEntry* lastChild;
     CELL_TYPE compressionLevel = 0;
     uint32_t maxChild = 0;
-    uint8_t* word = NULL;
+    //uint8_t* word = NULL;
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
