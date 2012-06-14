@@ -54,31 +54,16 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
         closeBitwiseBufferedFile(w);
         return -1;
     }
-    /*TODO DECOMMENTARE!!!
-    if //OR short circuit exploited to write the interpreter directive
-    (
-        fwrite(LZ78_INTERPRETER, 1, sizeof(LZ78_INTERPRETER), outputFile) < sizeof(LZ78_INTERPRETER)
-        ||
-        fflush(outputFile) == EOF
-    ) goto exceptionHandler;
-    */
-    //  printf("COMPRESSORE ONLINE\n");
     if(writeBitBuffer(w, (CELL_TYPE)compressionLevel, 3) == -1) goto exceptionHandler;
     while(!feof(inputFile) && !ferror(inputFile))
     {
         bufferedBytes = fread(readByte, 1, LOCAL_BYTE_BUFFER_LENGTH, inputFile);
         for(byteIndex = 0; byteIndex < bufferedBytes; byteIndex++)
         {
-            //printf("\nCerco: %c a partire da %i\n",readByte[byteIndex],lookupIndex);
             child = hashLookup(hashTable, lookupIndex, readByte[byteIndex], moduloMask);
-            if(child != ROOT_INDEX) //ROOT_INDEX means NOT FOUND
-            {
-                lookupIndex = child;
-                //printf("Trovato qui: %i\n",lookupIndex);
-            }
+            if(child != ROOT_INDEX) lookupIndex = child; //ROOT_INDEX means NOT FOUND
             else
             {
-              //  printf("Non l'ho trovato allora ");
                 if //OR short circuit evaluation exploited
                 (
                     writeBitBuffer(w, lookupIndex, indexLength) == -1
@@ -92,8 +77,6 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                         moduloMask
                     ) == -1
                 ) goto exceptionHandler;
-                //printf("ho scritto: %i\n", lookupIndex);
-                //printf("Ho inserito il figlio: %i\n\n", childIndex);
                 childIndex++;
                 if((childIndex & indexLengthMask) == 0) //A power of 2 is reached
                 {
@@ -103,7 +86,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                     indexLengthMask = (indexLengthMask << 1) | 1;
                 }
                 //readByte value is also the right index to start with next time
-        //because you have to start from the last character recognized
+                //because you have to start from the last character recognized
                 lookupIndex = readByte[byteIndex] + 1;
                 if (childIndex == maxChild) //hash table is full
                 {
@@ -127,9 +110,6 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
         ||
         writeBitBuffer(w, ROOT_INDEX, indexLength) == -1
     ) goto exceptionHandler;
-    //printf("ho scritto: %i\n", lookupIndex);
-    //printf("ho scritto: %i\n", ROOT_INDEX);
-    // printf("COMPRESSORE OFFLINE\n");
     hashDestroy(hashTable, hashTableLength);
     return closeBitwiseBufferedFile(w);
 
