@@ -131,8 +131,8 @@ ssize_t loadBitBuffer(int fileDescriptor, CELL_TYPE* buffer, size_t count)
     {
         readBytes = read(fileDescriptor, byteBuffer + n, count - n);
         if(readBytes == -1) return -1;
-        n += readBytes;
         if(readBytes == 0) break;
+        n += readBytes;
     }
     readBytes = n;
     #if CELL_TYPE_LENGTH != 8
