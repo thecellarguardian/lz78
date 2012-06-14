@@ -63,7 +63,6 @@ int decompress(FILE* inputFile, FILE* outputFile)
     struct LZ78DecompressorTableEntry* lastChild;
     CELL_TYPE compressionLevel = 0;
     uint32_t maxChild = 0;
-    //uint8_t* word = NULL;
     if(r == NULL || outputFile == NULL)
     {
         errno = EINVAL;
@@ -101,6 +100,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         {
             lastChild = &(table[childIndex - 1]);
             if(lastChild->length > 0) lastChild->length = 0;
+            // Deep magic starts here!
             if(currentIndex == childIndex - 1)
             {
                 auxilium = &(table[lastChild->fatherIndex]);
@@ -117,8 +117,8 @@ int decompress(FILE* inputFile, FILE* outputFile)
                     lastChild->word = realloc(lastChild->word, lastChild->bufferLength);
                 }
                 lastChild->word[lastChild->length - 1] =  lastChild->word[0];
-                //C'ERA PRIMA SOLO QUESTO lastChild->word[0] = (table[lastChild->fatherIndex].word[0]);
             }
+            // Deep magic ends here!
             else
             {
                 if(lastChild->bufferLength == 0)
@@ -131,14 +131,13 @@ int decompress(FILE* inputFile, FILE* outputFile)
                 if(currentIndex > (FIRST_CHILD - 1) && current->length == 1)
                 { //is not one of the first 257 and its word is not complete
                     auxilium = &(table[current->fatherIndex]);
-                    while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX) //TODO doppio ciclo
+                    while(auxilium->length == 1 && auxilium->fatherIndex != ROOT_INDEX)
                     {
                         preappend(current, auxilium);
                         auxilium = &(table[auxilium->fatherIndex]);
                     }//index cache
                     preappend(current, auxilium);
                     lastChild->word[0] = auxilium->word[0];
-                    //PRIMA C'ERA SOLO LUI ->  lastChild->word[0] = current->word[0];
                 }
                 else lastChild->word[0] = current->word[0];
             }
@@ -150,12 +149,8 @@ int decompress(FILE* inputFile, FILE* outputFile)
             errno = EBADFD;
             goto exceptionHandler;
         }
-        current = &(table[childIndex]); //Current cambia significato!
-        //current->length = 1;
-        //current->word = malloc(1);
+        current = &(table[childIndex]);
         current->fatherIndex = currentIndex;
-        //if(current->word == NULL) goto exceptionHandler;
-        //memcpy(current->word, result, length); //once upon a time, bcopy
         childIndex++;
         if((childIndex & indexLengthMask) == 0)//A power of two is reached
         {
@@ -164,7 +159,7 @@ int decompress(FILE* inputFile, FILE* outputFile)
         }
         if(childIndex == maxChild)
         {
-            /* No table reset is needed :) */
+            // No table reset is needed :)
             childIndex = FIRST_CHILD;
             indexLength = INITIAL_INDEX_LENGTH;
             indexLengthMask = INDEX_LENGTH_MASK;

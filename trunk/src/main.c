@@ -52,7 +52,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\n\
   -L, --license     display software license\n\
   -h, --help        display this message\n\
   -V, --version     display version number\n\n\
-Report bugs to <mettiamocelo@gnu.org>.\n";
+Report bugs to <cosimosacco@gmail.com> <davidesil.web@gmail.com>\n";
 
 static int fastFlag = 0;
 static int bestFlag = 0;
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
         )
         {
             fprintf(stdout, "File not compressed\n");
-            //remove(outputFile);
+            remove(outputFile);
             return 1;
         }
     }

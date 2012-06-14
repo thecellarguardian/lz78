@@ -43,7 +43,6 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
     uint32_t maxChild = getCompressionParameter(compressionLevel, MAX_CHILD);
     if(!(maxChild && hashTableEntries && moduloMask) || inputFile == NULL || w == NULL)
     {
-        printf("%u", HASH_TABLE_ENTRIES_MODULO_MASK);
         errno = EINVAL;
         if(w != NULL) closeBitwiseBufferedFile(w);
         return -1;

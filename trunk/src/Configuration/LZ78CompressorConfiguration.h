@@ -109,7 +109,7 @@
      * - maxChild: the maximum number of meaningful entries
      * - hashTableEntries: the total number of entries in the hash table
      *
-     * The bigger is maxChild, the better is the compression ration, but the
+     * The bigger is maxChild, the better is the compression ratio, but the
      * execution times are slown down.
      * Increasing hashTableEntries, the performances may increase, since the
      * collision probability becomes smaller (under the assumpt that a uniform
@@ -121,8 +121,8 @@
      * Given a compression level c >= 1, maxChild and hashTableEntries are
      * calculated as follows:
      *
-     * maxChild = (2^(14 + 2*c)) - 1
-     * hashTableEntries = (2^(14 + 2*c + 1))
+     * maxChild = (2^(14 + 2*c)) - 1   ----> hash table key: 24 (fatherIndex) + 8 (value) = 32
+     * hashTableEntries = (2^(14 + 2*c + 1)) 
      *
      * maxChild is the biggest unsigned integer representable on (14 + 2*c)bits.
      * hashTableEntries is the (14 + 2*c)th power of two (so, the modulo

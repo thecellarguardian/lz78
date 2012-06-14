@@ -30,13 +30,11 @@ struct LZ78DecompressorTableEntry
 {
     uint8_t* word;
     INDEX_TYPE fatherIndex;
-    CELL_TYPE length; // worst case = tree levels
+    CELL_TYPE length;
     CELL_TYPE bufferLength;
 };
 
 inline struct LZ78DecompressorTableEntry* tableCreate(uint32_t maxChild);
-
-inline void tableReset(struct LZ78DecompressorTableEntry* table, uint32_t maxChild);
 
 inline void tableDestroy(struct LZ78DecompressorTableEntry* table, uint32_t maxChild);
 
