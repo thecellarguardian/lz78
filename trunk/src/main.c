@@ -60,7 +60,6 @@ static int bestFlag = 0;
 int main(int argc, char** argv)
 {
     int optionToProcess = 0;
-    int outputFlag = 0;
     int compressFlag = -1;
     int compressionLevel = 0;
     char* inputFile = NULL;
@@ -127,7 +126,6 @@ int main(int argc, char** argv)
                 break;
             case 'o':
                 outputFile = optarg;
-                outputFlag = 1;
                 break;
             case -1:
                 break;
