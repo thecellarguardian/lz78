@@ -143,8 +143,8 @@ int main(int argc, char** argv)
     if(compressionLevel == 0) compressionLevel = DEFAULT_COMPRESSION_LEVEL;
     if(outputFile == NULL) outputFile = "out.lz78";
     input = fopen(inputFile,"r");
-    output = fopen(outputFile,"w+");
-    if(strcmp(inputFile, outputFile) == 0 || input == NULL || output == NULL)
+    output = (strcmp(inputFile, outputFile) == 0)? NULL : fopen(outputFile,"w+");
+    if(input == NULL || output == NULL)
     {
         fprintf(stderr, "Invalid file passed\n");
         return 1;

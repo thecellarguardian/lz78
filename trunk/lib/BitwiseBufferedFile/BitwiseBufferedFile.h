@@ -83,7 +83,7 @@ ssize_t readBitBuffer
  **/
 ssize_t writeBitBuffer
 (
-    struct BitwiseBufferedFile* bitFile, CELL_TYPE data, size_t length
+    struct BitwiseBufferedFile* bitFile, CELL_TYPE data, int length
 );
 
 inline int emptyFile(struct BitwiseBufferedFile* bitFile);

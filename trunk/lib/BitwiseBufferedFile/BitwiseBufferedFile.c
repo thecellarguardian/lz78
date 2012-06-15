@@ -258,7 +258,7 @@ ssize_t readBitBuffer
 
 ssize_t writeBitBuffer
 (
-    struct BitwiseBufferedFile* bitFile, CELL_TYPE data, size_t length
+    struct BitwiseBufferedFile* bitFile, CELL_TYPE data, int length
 )
 {
     int index;
@@ -266,7 +266,7 @@ ssize_t writeBitBuffer
     int bitsToBeWritten;
     CELL_TYPE mask;
     if(bitFile == NULL || length < 0 || length > CELL_TYPE_LENGTH)
-    {
+    {;
         errno = EINVAL;
         return -1;
     }

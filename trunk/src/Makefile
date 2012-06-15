@@ -1,15 +1,15 @@
 CC = gcc
-CFLAGS = -O2 -Wall -Werror
-BUFFER_CONFIGURATION_FILE = 'EXTERN_BUFFER_CONFIGURATION_FILE="../../src/Configuration/LZ78CompressorConfiguration.h"'
+CFLAGS = -O2 -Wall -Werror -D'EXTERNAL_BUFFER_CONFIGURATION_FILE="../../src/Configuration/LZ78CompressorConfiguration.h"'
+BUFFER_CONFIGURATION_FILE = \'EXTERNAL_BUFFER_CONFIGURATION_FILE=\"../../src/Configuration/LZ78CompressorConfiguration.h\"\'
 OBJS = ../lib/BitwiseBufferedFile/BitwiseBufferedFile.o ./Configuration/LZ78CompressorConfiguration.o ./Compressor/DataStructures/LZ78HashTable.o ./Decompressor/DataStructures/LZ78DecompressorTable.o ./Compressor/Algorithm/LZ78Compressor.o ./Decompressor/Algorithm/LZ78Decompressor.o main.o
-TARGET = lz78
+TARGET = ../bin/lz78
 
 $(TARGET):$(OBJS)                                
 	$(CC) $(OBJS) $(LDFLAGS) -o $(TARGET)
 	
 BitwiseBufferedFile.o:    \
 ../lib/BitwiseBufferedFile/BitwiseBufferedFile.c
-	$(CC) $(CFLAGS) -D $(BUFFER_CONFIGURATION_FILE) -c ../lib/BitwiseBufferedFile/BitwiseBufferedFile.c
+	$(CC) $(CFLAGS) -c ../lib/BitwiseBufferedFile/BitwiseBufferedFile.c
 	
 LZ78DecompressorTable.o:   \
 ./Decompressor/DataStructures/LZ78DecompressorTable.c
@@ -36,4 +36,4 @@ main.o: ./Compressor/Algorithm/LZ78Compressor.c     \
 ./Decompressor/Algorithm/LZ78Decompressor.c main.c
 
 clean:
-	-rm *.o $(TARGET)
+	-rm `find .. -name "*.o"` $(TARGET)
