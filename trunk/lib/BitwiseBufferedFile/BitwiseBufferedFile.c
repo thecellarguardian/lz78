@@ -266,7 +266,7 @@ ssize_t writeBitBuffer
     int bitsToBeWritten;
     CELL_TYPE mask;
     if(bitFile == NULL || length < 0 || length > CELL_TYPE_LENGTH)
-    {;
+    {
         errno = EINVAL;
         return -1;
     }
