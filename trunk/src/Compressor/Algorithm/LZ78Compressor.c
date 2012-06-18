@@ -86,7 +86,7 @@ int compress(FILE* inputFile, FILE* outputFile, int compressionLevel)
                 }
                 //readByte value is also the right index to start with next time
                 //because you have to start from the last character recognized
-                lookupIndex = readByte[byteIndex] + 1;
+                lookupIndex = readByte[byteIndex] + 1; //COMMENTARE!
                 if (childIndex == maxChild) //hash table is full
                 {
                     if(hashReset(hashTable, hashTableLength, moduloMask) == NULL)

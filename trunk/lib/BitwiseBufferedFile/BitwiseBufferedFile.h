@@ -27,6 +27,7 @@
 #ifndef BITWISE_BUFFERED_FILE
 #define BITWISE_BUFFERED_FILE
 
+//FORWARD DEC!
 /**
  * @brief BitwiseBufferedFile open function
  *

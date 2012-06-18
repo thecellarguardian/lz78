@@ -79,7 +79,7 @@ struct BitwiseBufferedFile* openBitwiseBufferedFile
 
 ssize_t storeBitBuffer(int fileDescriptor, CELL_TYPE* buffer, size_t count)
 {
-    ssize_t n = count/sizeof(CELL_TYPE) + (count%sizeof(CELL_TYPE) > 0);
+    ssize_t n = count/sizeof(CELL_TYPE) + ((count%sizeof(CELL_TYPE)) > 0);
     ssize_t writtenBytes = 0;
     uint8_t* byteBuffer = (uint8_t*)buffer; // buffer seen as a byte buffer
     if
